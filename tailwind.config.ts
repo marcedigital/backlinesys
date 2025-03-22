@@ -64,13 +64,16 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				booking: {
-					blue: '#0A84FF',
-					'light-blue': '#E5F1FF',
+					blue: '#3B82F6',      // Brighter blue
+					'light-blue': '#DBEAFE',
 					gray: '#F5F5F7',
 					'dark-gray': '#86868B',
-					green: '#34C759',
-					red: '#FF3B30',
-					orange: '#FF9500',
+					green: '#10B981',     // Brighter green
+					red: '#EF4444',       // Brighter red
+					orange: '#F97316',    // Brighter orange
+					purple: '#8B5CF6',    // New vibrant purple
+					pink: '#EC4899',      // New vibrant pink
+					yellow: '#FBBF24',    // New vibrant yellow
 					overlay: 'rgba(0, 0, 0, 0.5)',
 				}
 			},

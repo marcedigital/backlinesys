@@ -1,12 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { format, addDays, subDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Music, Mic, Headphones } from 'lucide-react';
 import TimeSlot from './TimeSlot';
 import BookingModal from './BookingModal';
 import { cn } from '@/lib/utils';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import {
   getDefaultAddOns,
   getUnavailableTimes,
@@ -35,7 +35,11 @@ const Calendar: React.FC = () => {
     totalPrice: 0
   });
 
-  // Generate time slots for all rooms when selected date changes
+  const roomImages = {
+    room1: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&h=800",
+    room2: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&h=800"
+  };
+
   useEffect(() => {
     const newTimeSlots: { [roomId: string]: TimeSlotType[] } = {};
     
@@ -48,7 +52,6 @@ const Calendar: React.FC = () => {
     resetSelection();
   }, [selectedDate]);
 
-  // Update booking details when selection changes
   useEffect(() => {
     if (selectionStart && selectionEnd) {
       const startSlot = selectionStart.startTime < selectionEnd.startTime ? selectionStart : selectionEnd;
@@ -65,7 +68,6 @@ const Calendar: React.FC = () => {
     }
   }, [selectionStart, selectionEnd, selectedRoom]);
 
-  // Update total price when booking details change
   useEffect(() => {
     const total = calculatePrice(
       bookingDetails.startTime,
@@ -85,7 +87,6 @@ const Calendar: React.FC = () => {
     setTempSelectionEnd(null);
     setIsSelecting(false);
     
-    // Reset selected state for all time slots in current room
     if (timeSlots[selectedRoom]) {
       setTimeSlots(prev => ({
         ...prev,
@@ -123,7 +124,6 @@ const Calendar: React.FC = () => {
     setSelectionStart(slot);
     setTempSelectionEnd(slot);
     
-    // Update time slots to show selection
     setTimeSlots(prev => ({
       ...prev,
       [selectedRoom]: prev[selectedRoom].map(s => ({
@@ -140,7 +140,6 @@ const Calendar: React.FC = () => {
     setSelectionEnd(slot);
     setTempSelectionEnd(null);
     
-    // Update all selected slots
     const currentTimeSlots = timeSlots[selectedRoom] || [];
     const startIndex = currentTimeSlots.findIndex(s => s.id === selectionStart?.id);
     const endIndex = currentTimeSlots.findIndex(s => s.id === slot.id);
@@ -157,7 +156,6 @@ const Calendar: React.FC = () => {
         }))
       }));
       
-      // Open booking modal after selection is complete
       setIsModalOpen(true);
     }
   };
@@ -198,10 +196,8 @@ const Calendar: React.FC = () => {
     setIsModalOpen(false);
     resetSelection();
     
-    // In a real app, you would save the booking here
     console.log('Booking confirmed:', bookingDetails);
     
-    // Reset add-ons selection
     setBookingDetails(prev => ({
       ...prev,
       startTime: null,
@@ -212,11 +208,10 @@ const Calendar: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
-      {/* Calendar header */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center">
-          <CalendarIcon className="mr-2 h-5 w-5 text-booking-blue" />
-          <h2 className="text-xl font-semibold">Meeting Room Booking</h2>
+          <Music className="mr-2 h-5 w-5 text-booking-purple" />
+          <h2 className="text-xl font-semibold">Music Rehearsal Room Booking</h2>
         </div>
         
         <div className="flex items-center space-x-2">
@@ -229,7 +224,7 @@ const Calendar: React.FC = () => {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           
-          <div className="px-4 py-2 rounded-md bg-booking-light-blue text-booking-blue font-medium">
+          <div className="px-4 py-2 rounded-md bg-booking-purple text-white font-medium">
             {format(selectedDate, 'MMMM d, yyyy')}
           </div>
           
@@ -244,18 +239,16 @@ const Calendar: React.FC = () => {
         </div>
       </div>
       
-      {/* Instructions */}
-      <div className="bg-secondary p-4 rounded-lg mb-6 text-sm">
-        <p className="font-medium">How to book:</p>
-        <ol className="list-decimal ml-5 mt-1 space-y-1">
-          <li>Select a room by clicking on a room tab</li>
+      <div className="bg-booking-light-blue p-4 rounded-lg mb-6 text-sm border border-booking-blue">
+        <p className="font-medium text-booking-blue">How to book:</p>
+        <ol className="list-decimal ml-5 mt-1 space-y-1 text-gray-800">
+          <li>Select a rehearsal room by clicking on a room tab</li>
           <li>Select a start time by clicking on an available time slot</li>
-          <li>Drag to select the duration of your meeting</li>
-          <li>Choose optional add-ons and confirm your booking</li>
+          <li>Drag to select the duration of your session</li>
+          <li>Choose optional equipment and confirm your booking</li>
         </ol>
       </div>
       
-      {/* Room tabs */}
       <Tabs 
         defaultValue={rooms[0].id} 
         value={selectedRoom} 
@@ -263,14 +256,45 @@ const Calendar: React.FC = () => {
         className="w-full"
       >
         <div className="mb-6">
-          <h3 className="text-base font-medium mb-3">Select a room:</h3>
-          <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+          <h3 className="text-base font-medium mb-3">Select a rehearsal room:</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {rooms.map(room => (
-              <TabsTrigger
+              <div 
                 key={room.id}
-                value={room.id}
-                className="py-3 data-[state=active]:bg-booking-light-blue data-[state=active]:text-booking-blue"
+                className={cn(
+                  "cursor-pointer transition-all duration-300 rounded-xl overflow-hidden border shadow-sm",
+                  selectedRoom === room.id ? "ring-2 ring-booking-purple border-booking-purple" : "border-gray-200 hover:border-booking-purple"
+                )}
+                onClick={() => handleRoomChange(room.id)}
               >
+                <AspectRatio ratio={3/2}>
+                  <img 
+                    src={roomImages[room.id as keyof typeof roomImages]} 
+                    alt={room.name}
+                    className="w-full h-full object-cover"
+                  />
+                </AspectRatio>
+                <div className={cn(
+                  "p-4",
+                  selectedRoom === room.id ? "bg-booking-purple text-white" : "bg-white"
+                )}>
+                  <div className="flex items-center">
+                    {room.id === 'room1' ? <Mic className="mr-2 h-4 w-4" /> : <Headphones className="mr-2 h-4 w-4" />}
+                    <h3 className="font-medium">{room.name}</h3>
+                  </div>
+                  <p className="text-sm mt-1 opacity-80">
+                    {room.id === 'room1' 
+                      ? "Perfect for bands and full rehearsals" 
+                      : "Ideal for solo musicians and vocalists"}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <TabsList className="hidden">
+            {rooms.map(room => (
+              <TabsTrigger key={room.id} value={room.id}>
                 {room.name}
               </TabsTrigger>
             ))}
@@ -296,7 +320,6 @@ const Calendar: React.FC = () => {
                 ))}
               </div>
               
-              {/* Legend */}
               <div className="mt-6 pt-4 border-t flex flex-wrap gap-4">
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-white border border-gray-300 rounded-sm mr-2"></div>
@@ -316,7 +339,6 @@ const Calendar: React.FC = () => {
         ))}
       </Tabs>
       
-      {/* Booking modal */}
       <BookingModal
         isOpen={isModalOpen}
         bookingDetails={bookingDetails}

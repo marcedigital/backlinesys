@@ -101,37 +101,37 @@ export const calculatePrice = (startTime: Date | null, endTime: Date | null, add
 export const getDefaultAddOns = (): AddOn[] => [
   {
     id: "1",
-    name: "Premium Sound System",
-    description: "High-quality audio equipment for presentations and music",
+    name: "Professional Microphones",
+    description: "Selection of high-quality vocal and instrument microphones",
     price: 25,
     selected: false
   },
   {
     id: "2",
-    name: "Video Conferencing",
-    description: "Professional video conferencing equipment with large displays",
+    name: "Amplifiers & Speakers",
+    description: "Professional sound system with mixing capabilities",
     price: 35,
     selected: false
   },
   {
     id: "3",
-    name: "Catering Service",
-    description: "Coffee, tea, and light snacks for your meeting",
+    name: "Drum Kit",
+    description: "Complete acoustic drum kit with cymbals",
     price: 40,
     selected: false
   },
   {
     id: "4",
-    name: "Whiteboard & Markers",
-    description: "Digital whiteboard with save functionality",
-    price: 15,
+    name: "Recording Service",
+    description: "Basic multi-track recording of your session",
+    price: 50,
     selected: false
   },
   {
     id: "5",
-    name: "Room Decoration",
-    description: "Professional decoration for special events",
-    price: 50,
+    name: "Keyboard/Synthesizer",
+    description: "Professional keyboard with various sound options",
+    price: 30,
     selected: false
   }
 ];
