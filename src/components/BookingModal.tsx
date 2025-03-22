@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { BookingDetails, formatTime, calculatePrice } from '@/utils/bookingUtils';
@@ -25,10 +25,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
 }) => {
   const { startTime, endTime, addOns, totalPrice } = bookingDetails;
 
-  // Recalculate price whenever selection changes
-  useEffect(() => {
-    calculatePrice(startTime, endTime, addOns);
-  }, [startTime, endTime, addOns]);
+  // Removed useEffect that was causing the issue
+  // The calculation is now done in the parent component
 
   const handleConfirm = () => {
     toast.success('Booking confirmed!', {

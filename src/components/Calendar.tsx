@@ -69,16 +69,18 @@ const Calendar: React.FC = () => {
   }, [selectionStart, selectionEnd, selectedRoom]);
 
   useEffect(() => {
-    const total = calculatePrice(
-      bookingDetails.startTime,
-      bookingDetails.endTime,
-      bookingDetails.addOns
-    );
-    
-    setBookingDetails(prev => ({
-      ...prev,
-      totalPrice: total
-    }));
+    if (bookingDetails.startTime && bookingDetails.endTime) {
+      const total = calculatePrice(
+        bookingDetails.startTime,
+        bookingDetails.endTime,
+        bookingDetails.addOns
+      );
+      
+      setBookingDetails(prev => ({
+        ...prev,
+        totalPrice: total
+      }));
+    }
   }, [bookingDetails.startTime, bookingDetails.endTime, bookingDetails.addOns]);
 
   const resetSelection = () => {
