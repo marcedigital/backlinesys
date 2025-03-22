@@ -30,19 +30,24 @@ const BookingModal: React.FC<BookingModalProps> = ({
 
   const handleConfirm = () => {
     toast.success('Booking confirmed!', {
-      description: `Your meeting room has been booked successfully.`,
+      description: `Your music rehearsal room has been booked successfully.`,
     });
     onConfirm();
   };
 
   const formatDate = (date: Date | null) => {
     if (!date) return '';
-    return date.toLocaleDateString('en-US', { 
+    return date.toLocaleDateString('es-CR', { 
       weekday: 'long',
       month: 'long', 
       day: 'numeric',
       year: 'numeric'
     });
+  };
+
+  // Format currency as Costa Rican Colones
+  const formatCurrency = (amount: number) => {
+    return `₡${amount.toLocaleString('es-CR')}`;
   };
 
   return (
@@ -80,7 +85,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
             <div className="mt-6 border-t pt-4">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Total price:</span>
-                <span className="text-xl font-semibold">${totalPrice.toFixed(2)}</span>
+                <span className="text-xl font-semibold">{formatCurrency(totalPrice)}</span>
               </div>
             </div>
           </div>

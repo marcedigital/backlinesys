@@ -1,4 +1,3 @@
-
 export interface TimeSlot {
   id: string;
   startTime: Date;
@@ -13,6 +12,7 @@ export interface AddOn {
   description: string;
   price: number;
   selected: boolean;
+  image?: string;
 }
 
 export interface BookingDetails {
@@ -84,55 +84,53 @@ export const calculateDuration = (startTime: Date, endTime: Date): number => {
 export const calculatePrice = (startTime: Date | null, endTime: Date | null, addOns: AddOn[]): number => {
   if (!startTime || !endTime) return 0;
   
-  // Base rate: $50 per hour
-  const hourlyRate = 50;
-  const durationInHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-  const basePrice = hourlyRate * durationInHours;
+  // Calculate duration in minutes
+  const durationInMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
+  const hours = Math.floor(durationInMinutes / 60);
+  const halfHours = Math.floor((durationInMinutes % 60) / 30);
   
-  // Add price of selected add-ons
+  // Base price:
+  // ¢10.000 for the first hour
+  // ¢5.000 for each additional hour
+  // ¢2.500 for each additional half hour
+  let basePrice = 10000; // First hour
+  
+  if (hours > 1) {
+    basePrice += (hours - 1) * 5000; // Additional full hours
+  }
+  
+  if (halfHours > 0) {
+    basePrice += halfHours * 2500; // Additional half hours
+  }
+  
+  // Add price of selected add-ons (¢2.000 per hour per add-on)
+  const addOnPricePerHour = 2000;
+  const totalHours = Math.ceil(durationInMinutes / 60); // Round up to nearest hour for add-ons
+  
   const addOnPrice = addOns.reduce((total, addOn) => {
-    return addOn.selected ? total + addOn.price : total;
+    return addOn.selected ? total + (addOnPricePerHour * totalHours) : total;
   }, 0);
   
-  return Math.round((basePrice + addOnPrice) * 100) / 100;
+  return Math.round(basePrice + addOnPrice);
 };
 
 // Sample add-ons data
 export const getDefaultAddOns = (): AddOn[] => [
   {
     id: "1",
-    name: "Professional Microphones",
-    description: "Selection of high-quality vocal and instrument microphones",
-    price: 25,
-    selected: false
+    name: "Alquiler de Platillos",
+    description: "Set completo de platillos para batería",
+    price: 2000,
+    selected: false,
+    image: "https://images.unsplash.com/photo-1445985543470-41fba5c3144a?auto=format&fit=crop&w=800"
   },
   {
     id: "2",
-    name: "Amplifiers & Speakers",
-    description: "Professional sound system with mixing capabilities",
-    price: 35,
-    selected: false
-  },
-  {
-    id: "3",
-    name: "Drum Kit",
-    description: "Complete acoustic drum kit with cymbals",
-    price: 40,
-    selected: false
-  },
-  {
-    id: "4",
-    name: "Recording Service",
-    description: "Basic multi-track recording of your session",
-    price: 50,
-    selected: false
-  },
-  {
-    id: "5",
-    name: "Keyboard/Synthesizer",
-    description: "Professional keyboard with various sound options",
-    price: 30,
-    selected: false
+    name: "Alquiler Pedal Doble de Bombo",
+    description: "Pedal doble profesional para bombo",
+    price: 2000,
+    selected: false,
+    image: "https://images.unsplash.com/photo-1631025693569-8e49e4229231?auto=format&fit=crop&w=800"
   }
 ];
 
