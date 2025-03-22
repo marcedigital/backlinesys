@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { format, addDays, subDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import TimeSlot from './TimeSlot';
 import BookingModal from './BookingModal';
@@ -13,30 +14,37 @@ import {
   calculatePrice,
   TimeSlot as TimeSlotType,
   BookingDetails,
-  AddOn
+  AddOn,
+  rooms
 } from '@/utils/bookingUtils';
 
 const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [timeSlots, setTimeSlots] = useState<TimeSlotType[]>([]);
+  const [selectedRoom, setSelectedRoom] = useState(rooms[0].id);
+  const [timeSlots, setTimeSlots] = useState<{ [roomId: string]: TimeSlotType[] }>({});
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionStart, setSelectionStart] = useState<TimeSlotType | null>(null);
   const [selectionEnd, setSelectionEnd] = useState<TimeSlotType | null>(null);
   const [tempSelectionEnd, setTempSelectionEnd] = useState<TimeSlotType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [bookingDetails, setBookingDetails] = useState<BookingDetails>({
-    room: 'Conference Room A',
+    room: rooms[0].name,
     startTime: null,
     endTime: null,
     addOns: getDefaultAddOns(),
     totalPrice: 0
   });
 
-  // Generate time slots when selected date changes
+  // Generate time slots for all rooms when selected date changes
   useEffect(() => {
-    const unavailableTimes = getUnavailableTimes(selectedDate);
-    const slots = generateTimeSlots(selectedDate, unavailableTimes);
-    setTimeSlots(slots);
+    const newTimeSlots: { [roomId: string]: TimeSlotType[] } = {};
+    
+    rooms.forEach(room => {
+      const unavailableTimes = getUnavailableTimes(selectedDate, room.id);
+      newTimeSlots[room.id] = generateTimeSlots(selectedDate, room.id, unavailableTimes);
+    });
+    
+    setTimeSlots(newTimeSlots);
     resetSelection();
   }, [selectedDate]);
 
@@ -46,13 +54,16 @@ const Calendar: React.FC = () => {
       const startSlot = selectionStart.startTime < selectionEnd.startTime ? selectionStart : selectionEnd;
       const endSlot = selectionStart.startTime < selectionEnd.startTime ? selectionEnd : selectionStart;
       
+      const roomName = rooms.find(room => room.id === selectedRoom)?.name || '';
+      
       setBookingDetails(prev => ({
         ...prev,
+        room: roomName,
         startTime: startSlot.startTime,
         endTime: endSlot.endTime
       }));
     }
-  }, [selectionStart, selectionEnd]);
+  }, [selectionStart, selectionEnd, selectedRoom]);
 
   // Update total price when booking details change
   useEffect(() => {
@@ -74,13 +85,16 @@ const Calendar: React.FC = () => {
     setTempSelectionEnd(null);
     setIsSelecting(false);
     
-    // Reset selected state for all time slots
-    setTimeSlots(prev => 
-      prev.map(slot => ({
-        ...slot,
-        isSelected: false
-      }))
-    );
+    // Reset selected state for all time slots in current room
+    if (timeSlots[selectedRoom]) {
+      setTimeSlots(prev => ({
+        ...prev,
+        [selectedRoom]: prev[selectedRoom].map(slot => ({
+          ...slot,
+          isSelected: false
+        }))
+      }));
+    }
   };
 
   const handlePreviousDay = () => {
@@ -91,6 +105,17 @@ const Calendar: React.FC = () => {
     setSelectedDate(prev => addDays(prev, 1));
   };
 
+  const handleRoomChange = (roomId: string) => {
+    resetSelection();
+    setSelectedRoom(roomId);
+    
+    const roomName = rooms.find(room => room.id === roomId)?.name || '';
+    setBookingDetails(prev => ({
+      ...prev,
+      room: roomName
+    }));
+  };
+
   const handleSelectStart = (slot: TimeSlotType) => {
     if (!slot.isAvailable) return;
     
@@ -99,12 +124,13 @@ const Calendar: React.FC = () => {
     setTempSelectionEnd(slot);
     
     // Update time slots to show selection
-    setTimeSlots(prev => 
-      prev.map(s => ({
+    setTimeSlots(prev => ({
+      ...prev,
+      [selectedRoom]: prev[selectedRoom].map(s => ({
         ...s,
         isSelected: s.id === slot.id
       }))
-    );
+    }));
   };
 
   const handleSelectEnd = (slot: TimeSlotType) => {
@@ -115,19 +141,21 @@ const Calendar: React.FC = () => {
     setTempSelectionEnd(null);
     
     // Update all selected slots
-    const startIndex = timeSlots.findIndex(s => s.id === selectionStart?.id);
-    const endIndex = timeSlots.findIndex(s => s.id === slot.id);
+    const currentTimeSlots = timeSlots[selectedRoom] || [];
+    const startIndex = currentTimeSlots.findIndex(s => s.id === selectionStart?.id);
+    const endIndex = currentTimeSlots.findIndex(s => s.id === slot.id);
     
     if (startIndex !== -1 && endIndex !== -1) {
       const min = Math.min(startIndex, endIndex);
       const max = Math.max(startIndex, endIndex);
       
-      setTimeSlots(prev => 
-        prev.map((s, i) => ({
+      setTimeSlots(prev => ({
+        ...prev,
+        [selectedRoom]: prev[selectedRoom].map((s, i) => ({
           ...s,
           isSelected: i >= min && i <= max && s.isAvailable
         }))
-      );
+      }));
       
       // Open booking modal after selection is complete
       setIsModalOpen(true);
@@ -220,46 +248,73 @@ const Calendar: React.FC = () => {
       <div className="bg-secondary p-4 rounded-lg mb-6 text-sm">
         <p className="font-medium">How to book:</p>
         <ol className="list-decimal ml-5 mt-1 space-y-1">
+          <li>Select a room by clicking on a room tab</li>
           <li>Select a start time by clicking on an available time slot</li>
           <li>Drag to select the duration of your meeting</li>
           <li>Choose optional add-ons and confirm your booking</li>
         </ol>
       </div>
       
-      {/* Time slots */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-border">
-        <h3 className="text-base font-medium mb-4">Available Times - {bookingDetails.room}</h3>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {timeSlots.map((slot) => (
-            <TimeSlot
-              key={slot.id}
-              slot={slot}
-              isSelecting={isSelecting}
-              isInSelectionRange={isInSelectionRange(slot)}
-              onSelectStart={handleSelectStart}
-              onSelectEnd={handleSelectEnd}
-              onMouseEnter={handleMouseEnter}
-            />
-          ))}
+      {/* Room tabs */}
+      <Tabs 
+        defaultValue={rooms[0].id} 
+        value={selectedRoom} 
+        onValueChange={handleRoomChange}
+        className="w-full"
+      >
+        <div className="mb-6">
+          <h3 className="text-base font-medium mb-3">Select a room:</h3>
+          <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+            {rooms.map(room => (
+              <TabsTrigger
+                key={room.id}
+                value={room.id}
+                className="py-3 data-[state=active]:bg-booking-light-blue data-[state=active]:text-booking-blue"
+              >
+                {room.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
         
-        {/* Legend */}
-        <div className="mt-6 pt-4 border-t flex flex-wrap gap-4">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-white border border-gray-300 rounded-sm mr-2"></div>
-            <span className="text-sm">Available</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-booking-light-blue border border-booking-blue rounded-sm mr-2"></div>
-            <span className="text-sm">Selected</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-booking-gray rounded-sm mr-2"></div>
-            <span className="text-sm">Unavailable</span>
-          </div>
-        </div>
-      </div>
+        {rooms.map(room => (
+          <TabsContent key={room.id} value={room.id} className="mt-0">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-border">
+              <h3 className="text-base font-medium mb-4">Available Times - {room.name}</h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {timeSlots[room.id]?.map((slot) => (
+                  <TimeSlot
+                    key={slot.id}
+                    slot={slot}
+                    isSelecting={isSelecting}
+                    isInSelectionRange={isInSelectionRange(slot)}
+                    onSelectStart={handleSelectStart}
+                    onSelectEnd={handleSelectEnd}
+                    onMouseEnter={handleMouseEnter}
+                  />
+                ))}
+              </div>
+              
+              {/* Legend */}
+              <div className="mt-6 pt-4 border-t flex flex-wrap gap-4">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-white border border-gray-300 rounded-sm mr-2"></div>
+                  <span className="text-sm">Available</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-booking-light-blue border border-booking-blue rounded-sm mr-2"></div>
+                  <span className="text-sm">Selected</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-booking-gray rounded-sm mr-2"></div>
+                  <span className="text-sm">Unavailable</span>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
       
       {/* Booking modal */}
       <BookingModal

@@ -23,8 +23,19 @@ export interface BookingDetails {
   totalPrice: number;
 }
 
-// Generate time slots for a specific day
-export const generateTimeSlots = (date: Date, unavailableTimes: Array<[Date, Date]> = []): TimeSlot[] => {
+export interface Room {
+  id: string;
+  name: string;
+}
+
+// Available rooms
+export const rooms: Room[] = [
+  { id: "room1", name: "Sala 1" },
+  { id: "room2", name: "Sala 2" },
+];
+
+// Generate time slots for a specific day and room
+export const generateTimeSlots = (date: Date, roomId: string, unavailableTimes: Array<[Date, Date]> = []): TimeSlot[] => {
   const slots: TimeSlot[] = [];
   const startHour = 8; // 8 AM
   const endHour = 20; // 8 PM
@@ -43,7 +54,7 @@ export const generateTimeSlots = (date: Date, unavailableTimes: Array<[Date, Dat
       });
       
       slots.push({
-        id: `${startTime.toISOString()}`,
+        id: `${roomId}-${startTime.toISOString()}`,
         startTime,
         endTime,
         isAvailable,
@@ -125,30 +136,41 @@ export const getDefaultAddOns = (): AddOn[] => [
   }
 ];
 
-// Sample unavailable time slots
-export const getUnavailableTimes = (date: Date): Array<[Date, Date]> => {
+// Sample unavailable time slots for each room
+export const getUnavailableTimes = (date: Date, roomId: string): Array<[Date, Date]> => {
   const unavailable: Array<[Date, Date]> = [];
   
-  // Example: 10:00 AM - 11:30 AM is unavailable
-  const unavailStart1 = new Date(date);
-  unavailStart1.setHours(10, 0, 0, 0);
-  const unavailEnd1 = new Date(date);
-  unavailEnd1.setHours(11, 30, 0, 0);
-  unavailable.push([unavailStart1, unavailEnd1]);
-  
-  // Example: 2:00 PM - 3:00 PM is unavailable
-  const unavailStart2 = new Date(date);
-  unavailStart2.setHours(14, 0, 0, 0);
-  const unavailEnd2 = new Date(date);
-  unavailEnd2.setHours(15, 0, 0, 0);
-  unavailable.push([unavailStart2, unavailEnd2]);
-  
-  // Example: 4:30 PM - 5:30 PM is unavailable
-  const unavailStart3 = new Date(date);
-  unavailStart3.setHours(16, 30, 0, 0);
-  const unavailEnd3 = new Date(date);
-  unavailEnd3.setHours(17, 30, 0, 0);
-  unavailable.push([unavailStart3, unavailEnd3]);
+  if (roomId === "room1") {
+    // Sala 1 unavailable times
+    // Example: 10:00 AM - 11:30 AM is unavailable
+    const unavailStart1 = new Date(date);
+    unavailStart1.setHours(10, 0, 0, 0);
+    const unavailEnd1 = new Date(date);
+    unavailEnd1.setHours(11, 30, 0, 0);
+    unavailable.push([unavailStart1, unavailEnd1]);
+    
+    // Example: 2:00 PM - 3:00 PM is unavailable
+    const unavailStart2 = new Date(date);
+    unavailStart2.setHours(14, 0, 0, 0);
+    const unavailEnd2 = new Date(date);
+    unavailEnd2.setHours(15, 0, 0, 0);
+    unavailable.push([unavailStart2, unavailEnd2]);
+  } else if (roomId === "room2") {
+    // Sala 2 unavailable times
+    // Example: 9:00 AM - 10:30 AM is unavailable
+    const unavailStart1 = new Date(date);
+    unavailStart1.setHours(9, 0, 0, 0);
+    const unavailEnd1 = new Date(date);
+    unavailEnd1.setHours(10, 30, 0, 0);
+    unavailable.push([unavailStart1, unavailEnd1]);
+    
+    // Example: 4:30 PM - 5:30 PM is unavailable
+    const unavailStart2 = new Date(date);
+    unavailStart2.setHours(16, 30, 0, 0);
+    const unavailEnd2 = new Date(date);
+    unavailEnd2.setHours(17, 30, 0, 0);
+    unavailable.push([unavailStart2, unavailEnd2]);
+  }
   
   return unavailable;
 };
