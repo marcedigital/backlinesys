@@ -1,3 +1,4 @@
+
 export interface TimeSlot {
   id: string;
   startTime: Date;
@@ -37,30 +38,29 @@ export const rooms: Room[] = [
 // Generate time slots for a specific day and room
 export const generateTimeSlots = (date: Date, roomId: string, unavailableTimes: Array<[Date, Date]> = []): TimeSlot[] => {
   const slots: TimeSlot[] = [];
-  const startHour = 8; // 8 AM
-  const endHour = 20; // 8 PM
+  const startHour = 0; // 12 AM
+  const endHour = 24; // 12 AM next day
   
+  // Solo generar slots para horas completas
   for (let hour = startHour; hour < endHour; hour++) {
-    for (let minutes = 0; minutes < 60; minutes += 30) {
-      const startTime = new Date(date);
-      startTime.setHours(hour, minutes, 0, 0);
-      
-      const endTime = new Date(startTime);
-      endTime.setMinutes(endTime.getMinutes() + 30);
-      
-      // Check if this slot overlaps with any unavailable time
-      const isAvailable = !unavailableTimes.some(([unavailStart, unavailEnd]) => {
-        return startTime < unavailEnd && endTime > unavailStart;
-      });
-      
-      slots.push({
-        id: `${roomId}-${startTime.toISOString()}`,
-        startTime,
-        endTime,
-        isAvailable,
-        isSelected: false,
-      });
-    }
+    const startTime = new Date(date);
+    startTime.setHours(hour, 0, 0, 0);
+    
+    const endTime = new Date(startTime);
+    endTime.setHours(endTime.getHours() + 1);
+    
+    // Check if this slot overlaps with any unavailable time
+    const isAvailable = !unavailableTimes.some(([unavailStart, unavailEnd]) => {
+      return startTime < unavailEnd && endTime > unavailStart;
+    });
+    
+    slots.push({
+      id: `${roomId}-${startTime.toISOString()}`,
+      startTime,
+      endTime,
+      isAvailable,
+      isSelected: false,
+    });
   }
   
   return slots;
@@ -114,6 +114,28 @@ export const calculatePrice = (startTime: Date | null, endTime: Date | null, add
   return Math.round(basePrice + addOnPrice);
 };
 
+// Verifica si un rango de slots es continuo (sin huecos de disponibilidad)
+export const areSlotsContinuous = (slots: TimeSlot[], startSlot: TimeSlot, endSlot: TimeSlot): boolean => {
+  if (!startSlot || !endSlot) return false;
+  
+  const startIndex = slots.findIndex(slot => slot.id === startSlot.id);
+  const endIndex = slots.findIndex(slot => slot.id === endSlot.id);
+  
+  if (startIndex === -1 || endIndex === -1) return false;
+  
+  const min = Math.min(startIndex, endIndex);
+  const max = Math.max(startIndex, endIndex);
+  
+  // Verificar que todos los slots entre min y max estén disponibles
+  for (let i = min; i <= max; i++) {
+    if (!slots[i].isAvailable) {
+      return false;
+    }
+  }
+  
+  return true;
+};
+
 // Sample add-ons data
 export const getDefaultAddOns = (): AddOn[] => [
   {
@@ -140,11 +162,11 @@ export const getUnavailableTimes = (date: Date, roomId: string): Array<[Date, Da
   
   if (roomId === "room1") {
     // Sala 1 unavailable times
-    // Example: 10:00 AM - 11:30 AM is unavailable
+    // Example: 10:00 AM - 11:00 AM is unavailable
     const unavailStart1 = new Date(date);
     unavailStart1.setHours(10, 0, 0, 0);
     const unavailEnd1 = new Date(date);
-    unavailEnd1.setHours(11, 30, 0, 0);
+    unavailEnd1.setHours(11, 0, 0, 0);
     unavailable.push([unavailStart1, unavailEnd1]);
     
     // Example: 2:00 PM - 3:00 PM is unavailable
@@ -155,18 +177,18 @@ export const getUnavailableTimes = (date: Date, roomId: string): Array<[Date, Da
     unavailable.push([unavailStart2, unavailEnd2]);
   } else if (roomId === "room2") {
     // Sala 2 unavailable times
-    // Example: 9:00 AM - 10:30 AM is unavailable
+    // Example: 9:00 AM - 10:00 AM is unavailable
     const unavailStart1 = new Date(date);
     unavailStart1.setHours(9, 0, 0, 0);
     const unavailEnd1 = new Date(date);
-    unavailEnd1.setHours(10, 30, 0, 0);
+    unavailEnd1.setHours(10, 0, 0, 0);
     unavailable.push([unavailStart1, unavailEnd1]);
     
-    // Example: 4:30 PM - 5:30 PM is unavailable
+    // Example: 4:00 PM - 5:00 PM is unavailable
     const unavailStart2 = new Date(date);
-    unavailStart2.setHours(16, 30, 0, 0);
+    unavailStart2.setHours(16, 0, 0, 0);
     const unavailEnd2 = new Date(date);
-    unavailEnd2.setHours(17, 30, 0, 0);
+    unavailEnd2.setHours(17, 0, 0, 0);
     unavailable.push([unavailStart2, unavailEnd2]);
   }
   

@@ -6,6 +6,7 @@ import {
   getUnavailableTimes,
   generateTimeSlots,
   calculatePrice,
+  areSlotsContinuous,
   TimeSlot as TimeSlotType,
   BookingDetails,
   rooms
@@ -15,11 +16,13 @@ import CalendarHeader from './calendar/CalendarHeader';
 import BookingInstructions from './calendar/BookingInstructions';
 import RoomSelector from './calendar/RoomSelector';
 import RoomTimeslots from './calendar/RoomTimeslots';
+import { toast } from 'sonner';
 
 const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedRoom, setSelectedRoom] = useState(rooms[0].id);
   const [timeSlots, setTimeSlots] = useState<{ [roomId: string]: TimeSlotType[] }>({});
+  const [nextDayTimeSlots, setNextDayTimeSlots] = useState<{ [roomId: string]: TimeSlotType[] }>({});
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionStart, setSelectionStart] = useState<TimeSlotType | null>(null);
   const [selectionEnd, setSelectionEnd] = useState<TimeSlotType | null>(null);
@@ -38,15 +41,22 @@ const Calendar: React.FC = () => {
     room2: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&h=800"
   };
 
+  // Cargar slots para el día actual
   useEffect(() => {
-    const newTimeSlots: { [roomId: string]: TimeSlotType[] } = {};
+    const currentDateSlots: { [roomId: string]: TimeSlotType[] } = {};
+    const nextDateSlots: { [roomId: string]: TimeSlotType[] } = {};
+    const nextDay = addDays(selectedDate, 1);
     
     rooms.forEach(room => {
       const unavailableTimes = getUnavailableTimes(selectedDate, room.id);
-      newTimeSlots[room.id] = generateTimeSlots(selectedDate, room.id, unavailableTimes);
+      const unavailableTimesNextDay = getUnavailableTimes(nextDay, room.id);
+      
+      currentDateSlots[room.id] = generateTimeSlots(selectedDate, room.id, unavailableTimes);
+      nextDateSlots[room.id] = generateTimeSlots(nextDay, room.id, unavailableTimesNextDay);
     });
     
-    setTimeSlots(newTimeSlots);
+    setTimeSlots(currentDateSlots);
+    setNextDayTimeSlots(nextDateSlots);
     resetSelection();
   }, [selectedDate]);
 
@@ -87,8 +97,20 @@ const Calendar: React.FC = () => {
     setTempSelectionEnd(null);
     setIsSelecting(false);
     
+    // Reset current day slots
     if (timeSlots[selectedRoom]) {
       setTimeSlots(prev => ({
+        ...prev,
+        [selectedRoom]: prev[selectedRoom].map(slot => ({
+          ...slot,
+          isSelected: false
+        }))
+      }));
+    }
+    
+    // Reset next day slots
+    if (nextDayTimeSlots[selectedRoom]) {
+      setNextDayTimeSlots(prev => ({
         ...prev,
         [selectedRoom]: prev[selectedRoom].map(slot => ({
           ...slot,
@@ -124,40 +146,145 @@ const Calendar: React.FC = () => {
     setSelectionStart(slot);
     setTempSelectionEnd(slot);
     
-    setTimeSlots(prev => ({
-      ...prev,
-      [selectedRoom]: prev[selectedRoom].map(s => ({
-        ...s,
-        isSelected: s.id === slot.id
-      }))
-    }));
+    // Marcar como seleccionado en el día actual o en el día siguiente
+    const isCurrentDaySlot = timeSlots[selectedRoom]?.some(s => s.id === slot.id);
+    
+    if (isCurrentDaySlot) {
+      setTimeSlots(prev => ({
+        ...prev,
+        [selectedRoom]: prev[selectedRoom].map(s => ({
+          ...s,
+          isSelected: s.id === slot.id
+        }))
+      }));
+    } else {
+      setNextDayTimeSlots(prev => ({
+        ...prev,
+        [selectedRoom]: prev[selectedRoom].map(s => ({
+          ...s,
+          isSelected: s.id === slot.id
+        }))
+      }));
+    }
   };
 
   const handleSelectEnd = (slot: TimeSlotType) => {
-    if (!isSelecting || !slot.isAvailable) return;
+    if (!isSelecting || !slot.isAvailable || !selectionStart) return;
+    
+    // Determinar si los slots están en el mismo día o en días diferentes
+    const isStartInCurrentDay = timeSlots[selectedRoom]?.some(s => s.id === selectionStart.id);
+    const isEndInCurrentDay = timeSlots[selectedRoom]?.some(s => s.id === slot.id);
+    
+    // Si ambos están en el mismo día, verificar continuidad
+    if (isStartInCurrentDay && isEndInCurrentDay) {
+      const currentDaySlots = timeSlots[selectedRoom] || [];
+      if (!areSlotsContinuous(currentDaySlots, selectionStart, slot)) {
+        toast.error("Solo puedes seleccionar horas continuas sin espacios ocupados entre ellas");
+        resetSelection();
+        return;
+      }
+      
+      // Marcar selección en el día actual
+      const startIndex = currentDaySlots.findIndex(s => s.id === selectionStart.id);
+      const endIndex = currentDaySlots.findIndex(s => s.id === slot.id);
+      
+      if (startIndex !== -1 && endIndex !== -1) {
+        const min = Math.min(startIndex, endIndex);
+        const max = Math.max(startIndex, endIndex);
+        
+        setTimeSlots(prev => ({
+          ...prev,
+          [selectedRoom]: prev[selectedRoom].map((s, i) => ({
+            ...s,
+            isSelected: i >= min && i <= max && s.isAvailable
+          }))
+        }));
+      }
+    } 
+    // Si selección cruza días, verificar continuidad especial
+    else if ((isStartInCurrentDay && !isEndInCurrentDay) || (!isStartInCurrentDay && isEndInCurrentDay)) {
+      const currentDaySlots = timeSlots[selectedRoom] || [];
+      const nextDaySlots = nextDayTimeSlots[selectedRoom] || [];
+      
+      // Verificar si la selección cruza la medianoche de manera válida
+      if (isStartInCurrentDay) {
+        // Selección desde día actual hasta día siguiente
+        const startIndex = currentDaySlots.findIndex(s => s.id === selectionStart.id);
+        const endIndex = nextDaySlots.findIndex(s => s.id === slot.id);
+        
+        if (startIndex !== -1 && endIndex !== -1) {
+          // Verificar que todos los slots desde startIndex hasta el final del día actual estén disponibles
+          const isValidInCurrentDay = currentDaySlots.slice(startIndex).every(s => s.isAvailable);
+          // Verificar que todos los slots desde el inicio del día siguiente hasta endIndex estén disponibles
+          const isValidInNextDay = nextDaySlots.slice(0, endIndex + 1).every(s => s.isAvailable);
+          
+          if (!isValidInCurrentDay || !isValidInNextDay) {
+            toast.error("Solo puedes seleccionar horas continuas sin espacios ocupados entre ellas");
+            resetSelection();
+            return;
+          }
+          
+          // Marcar slots seleccionados en ambos días
+          setTimeSlots(prev => ({
+            ...prev,
+            [selectedRoom]: prev[selectedRoom].map((s, i) => ({
+              ...s,
+              isSelected: i >= startIndex && s.isAvailable
+            }))
+          }));
+          
+          setNextDayTimeSlots(prev => ({
+            ...prev,
+            [selectedRoom]: prev[selectedRoom].map((s, i) => ({
+              ...s,
+              isSelected: i <= endIndex && s.isAvailable
+            }))
+          }));
+        }
+      } else {
+        // Selección desde día siguiente hasta día actual
+        const startIndex = nextDaySlots.findIndex(s => s.id === selectionStart.id);
+        const endIndex = currentDaySlots.findIndex(s => s.id === slot.id);
+        
+        if (startIndex !== -1 && endIndex !== -1) {
+          // Verificar continuidad (no implementado en este caso por complejidad)
+          toast.error("La selección de días en orden inverso no está soportada");
+          resetSelection();
+          return;
+        }
+      }
+    }
+    // Si ambos están en el día siguiente, verificar continuidad
+    else if (!isStartInCurrentDay && !isEndInCurrentDay) {
+      const nextDaySlots = nextDayTimeSlots[selectedRoom] || [];
+      if (!areSlotsContinuous(nextDaySlots, selectionStart, slot)) {
+        toast.error("Solo puedes seleccionar horas continuas sin espacios ocupados entre ellas");
+        resetSelection();
+        return;
+      }
+      
+      // Marcar selección en el día siguiente
+      const startIndex = nextDaySlots.findIndex(s => s.id === selectionStart.id);
+      const endIndex = nextDaySlots.findIndex(s => s.id === slot.id);
+      
+      if (startIndex !== -1 && endIndex !== -1) {
+        const min = Math.min(startIndex, endIndex);
+        const max = Math.max(startIndex, endIndex);
+        
+        setNextDayTimeSlots(prev => ({
+          ...prev,
+          [selectedRoom]: prev[selectedRoom].map((s, i) => ({
+            ...s,
+            isSelected: i >= min && i <= max && s.isAvailable
+          }))
+        }));
+      }
+    }
     
     setIsSelecting(false);
     setSelectionEnd(slot);
     setTempSelectionEnd(null);
-    
-    const currentTimeSlots = timeSlots[selectedRoom] || [];
-    const startIndex = currentTimeSlots.findIndex(s => s.id === selectionStart?.id);
-    const endIndex = currentTimeSlots.findIndex(s => s.id === slot.id);
-    
-    if (startIndex !== -1 && endIndex !== -1) {
-      const min = Math.min(startIndex, endIndex);
-      const max = Math.max(startIndex, endIndex);
-      
-      setTimeSlots(prev => ({
-        ...prev,
-        [selectedRoom]: prev[selectedRoom].map((s, i) => ({
-          ...s,
-          isSelected: i >= min && i <= max && s.isAvailable
-        }))
-      }));
-      
-      setIsModalOpen(true);
-    }
+    setIsModalOpen(true);
   };
 
   const handleMouseEnter = (slot: TimeSlotType) => {
@@ -234,6 +361,21 @@ const Calendar: React.FC = () => {
         onMouseEnter={handleMouseEnter}
         isInSelectionRange={isInSelectionRange}
       />
+      
+      <div className="mt-8">
+        <h3 className="text-lg font-medium mb-4">Horas disponibles - Siguiente día</h3>
+        <RoomTimeslots
+          rooms={rooms}
+          selectedRoom={selectedRoom}
+          timeSlots={nextDayTimeSlots}
+          isSelecting={isSelecting}
+          onRoomChange={handleRoomChange}
+          onSelectStart={handleSelectStart}
+          onSelectEnd={handleSelectEnd}
+          onMouseEnter={handleMouseEnter}
+          isInSelectionRange={isInSelectionRange}
+        />
+      </div>
       
       <BookingModal
         isOpen={isModalOpen}
