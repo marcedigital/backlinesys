@@ -40,9 +40,9 @@ const TimeSlot: React.FC<TimeSlotProps> = ({
       className={cn(
         'time-slot relative rounded-md p-2 mb-1 transition-all duration-200 border',
         slot.isAvailable ? 'cursor-pointer hover:shadow-md' : 'cursor-not-allowed',
-        slot.isSelected ? 'border-booking-purple bg-booking-purple bg-opacity-10 text-booking-purple' : 'border-transparent',
-        isInSelectionRange && slot.isAvailable ? 'bg-booking-purple bg-opacity-10 border-booking-purple' : '',
-        !slot.isAvailable && 'bg-booking-gray text-booking-dark-gray'
+        slot.isSelected ? 'border-accent bg-accent bg-opacity-10 text-accent' : 'border-transparent',
+        isInSelectionRange && slot.isAvailable ? 'bg-accent bg-opacity-10 border-accent' : '',
+        !slot.isAvailable && 'bg-gray-100 text-gray-500'
       )}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
@@ -50,23 +50,15 @@ const TimeSlot: React.FC<TimeSlotProps> = ({
       <div className="flex justify-between items-center">
         <span className="text-sm font-medium">{formatTime(slot.startTime)}</span>
         {!slot.isAvailable && (
-          <span className="text-xs px-2 py-0.5 bg-booking-red bg-opacity-10 text-booking-red rounded-full">
+          <span className="text-xs px-2 py-0.5 bg-secondary bg-opacity-10 text-secondary rounded-full">
             Booked
           </span>
         )}
       </div>
       
-      {/* Hover effect */}
-      <div 
-        className={cn(
-          "absolute inset-0 rounded-md border-2 border-booking-purple opacity-0 transition-opacity duration-200",
-          (!isSelecting && slot.isAvailable) && "group-hover:opacity-100"
-        )}
-      />
-      
       {/* Visual indicator for selected slots */}
       {(slot.isSelected || isInSelectionRange) && slot.isAvailable && (
-        <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-4 bg-booking-purple rounded-full" />
+        <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-4 bg-accent rounded-full" />
       )}
     </div>
   );

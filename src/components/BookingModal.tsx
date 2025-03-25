@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -58,17 +59,17 @@ const BookingModal: React.FC<BookingModalProps> = ({
       <DialogContent className="sm:max-w-[500px] glass-morphism animate-scale-in">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold flex items-center">
-            <CalendarClock className="w-5 h-5 mr-2 text-booking-blue" />
+            <CalendarClock className="w-5 h-5 mr-2 text-primary" />
             Complete your booking
           </DialogTitle>
         </DialogHeader>
 
         {startTime && endTime && (
           <div className="mb-4">
-            <div className="bg-booking-light-blue rounded-lg p-4 mb-4">
+            <div className="bg-primary/10 rounded-lg p-4 mb-4">
               <div className="text-sm text-muted-foreground mb-1">Selected time:</div>
               <div className="font-medium">{formatDate(startTime)}</div>
-              <div className="flex items-center mt-2 text-booking-blue">
+              <div className="flex items-center mt-2 text-primary">
                 <Clock className="w-4 h-4 mr-1" />
                 <span>{formatTime(startTime)} - {formatTime(endTime)}</span>
               </div>
@@ -105,7 +106,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
           </Button>
           <Button 
             onClick={handleConfirm}
-            className="bg-booking-blue hover:bg-booking-blue/90 text-white flex items-center"
+            className="bg-accent hover:bg-accent/90 text-white flex items-center"
           >
             <Check className="w-4 h-4 mr-1" />
             Confirm Booking

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { addDays, subDays } from 'date-fns';
+import { addDays } from 'date-fns';
 import {
   getDefaultAddOns,
   getUnavailableTimes,
@@ -38,11 +38,11 @@ const Calendar: React.FC = () => {
   });
 
   const roomImages = {
-    room1: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&h=800",
-    room2: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&h=800"
+    room1: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&h=400",
+    room2: "https://images.unsplash.com/photo-1519508234439-4f23643125c1?auto=format&fit=crop&w=1200&h=400"
   };
 
-  // Cargar slots para el día actual y siguiente
+  // Load slots for current and next day
   useEffect(() => {
     const currentDateSlots: { [roomId: string]: TimeSlotType[] } = {};
     const nextDateSlots: { [roomId: string]: TimeSlotType[] } = {};
@@ -123,12 +123,8 @@ const Calendar: React.FC = () => {
     }
   };
 
-  const handlePreviousDay = () => {
-    setSelectedDate(prev => subDays(prev, 1));
-  };
-
-  const handleNextDay = () => {
-    setSelectedDate(prev => addDays(prev, 1));
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
   };
 
   const handleRoomChange = (roomId: string) => {
@@ -140,6 +136,14 @@ const Calendar: React.FC = () => {
       ...prev,
       room: roomName
     }));
+  };
+
+  const handlePreviousDay = () => {
+    setSelectedDate(prev => subDays(prev, 1));
+  };
+
+  const handleNextDay = () => {
+    setSelectedDate(prev => addDays(prev, 1));
   };
 
   const handleSelectStart = (slot: TimeSlotType) => {
@@ -357,8 +361,7 @@ const Calendar: React.FC = () => {
     <div className="animate-fade-in">
       <CalendarHeader 
         selectedDate={selectedDate}
-        onPreviousDay={handlePreviousDay}
-        onNextDay={handleNextDay}
+        onDateChange={handleDateChange}
       />
       
       <BookingInstructions />

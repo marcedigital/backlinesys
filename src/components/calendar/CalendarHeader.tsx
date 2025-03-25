@@ -1,50 +1,60 @@
 
-import React from 'react';
-import { format, addDays, subDays } from 'date-fns';
+import React, { useState } from 'react';
+import { format, addMonths } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Music } from 'lucide-react';
+import { Calendar as CalendarIcon, Music } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 interface CalendarHeaderProps {
   selectedDate: Date;
-  onPreviousDay: () => void;
-  onNextDay: () => void;
+  onDateChange: (date: Date) => void;
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   selectedDate,
-  onPreviousDay,
-  onNextDay,
+  onDateChange,
 }) => {
+  const today = new Date();
+  const threeMonthsLater = addMonths(today, 3);
+
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center">
-        <Music className="mr-2 h-5 w-5 text-booking-purple" />
+        <Music className="mr-2 h-5 w-5 text-accent" />
         <h2 className="text-xl font-semibold">Music Rehearsal Room Booking</h2>
       </div>
       
-      <div className="flex items-center space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onPreviousDay}
-          className="flex items-center"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        
-        <div className="px-4 py-2 rounded-md bg-booking-purple text-white font-medium">
-          {format(selectedDate, 'MMMM d, yyyy')}
-        </div>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onNextDay}
-          className="flex items-center"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              "justify-start text-left font-medium bg-white hover:bg-accent/10",
+              "border border-input hover:text-accent"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {format(selectedDate, 'MMMM d, yyyy')}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0 z-50 bg-white" align="end">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(date) => date && onDateChange(date)}
+            initialFocus
+            fromDate={today}
+            toDate={threeMonthsLater}
+            className="p-3 pointer-events-auto"
+          />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

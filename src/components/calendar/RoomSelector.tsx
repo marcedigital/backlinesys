@@ -29,11 +29,11 @@ const RoomSelector: React.FC<RoomSelectorProps> = ({
             key={room.id}
             className={cn(
               "cursor-pointer transition-all duration-300 rounded-xl overflow-hidden border shadow-sm",
-              selectedRoom === room.id ? "ring-2 ring-booking-purple border-booking-purple" : "border-gray-200 hover:border-booking-purple"
+              selectedRoom === room.id ? "ring-2 ring-accent border-accent" : "border-gray-200 hover:border-accent"
             )}
             onClick={() => onRoomChange(room.id)}
           >
-            <AspectRatio ratio={3/2}>
+            <AspectRatio ratio={3/1}>
               <img 
                 src={roomImages[room.id]} 
                 alt={room.name}
@@ -42,7 +42,7 @@ const RoomSelector: React.FC<RoomSelectorProps> = ({
             </AspectRatio>
             <div className={cn(
               "p-4",
-              selectedRoom === room.id ? "bg-booking-purple text-white" : "bg-white"
+              selectedRoom === room.id ? "bg-accent text-accent-foreground" : "bg-white"
             )}>
               <div className="flex items-center">
                 {room.id === 'room1' ? <Mic className="mr-2 h-4 w-4" /> : <Headphones className="mr-2 h-4 w-4" />}

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -26,12 +25,12 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#00FFE5',
+					foreground: '#000000'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#920DBA',
+					foreground: '#ffffff'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -42,8 +41,8 @@ export default {
 					foreground: 'hsl(var(--muted-foreground))'
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: '#920DBA',
+					foreground: '#ffffff'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -53,27 +52,17 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				},
 				booking: {
-					blue: '#3B82F6',      // Brighter blue
+					blue: '#00FFE5',      // Updated to primary color
 					'light-blue': '#DBEAFE',
 					gray: '#F5F5F7',
 					'dark-gray': '#86868B',
-					green: '#10B981',     // Brighter green
-					red: '#EF4444',       // Brighter red
-					orange: '#F97316',    // Brighter orange
-					purple: '#8B5CF6',    // New vibrant purple
-					pink: '#EC4899',      // New vibrant pink
-					yellow: '#FBBF24',    // New vibrant yellow
+					green: '#10B981',
+					red: '#EF4444',
+					orange: '#F97316',
+					purple: '#920DBA',    // Updated to secondary/accent color
+					pink: '#EC4899',
+					yellow: '#FFD400',    // Updated to tertiary color
 					overlay: 'rgba(0, 0, 0, 0.5)',
 				}
 			},
