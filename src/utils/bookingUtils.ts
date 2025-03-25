@@ -1,4 +1,3 @@
-
 export interface TimeSlot {
   id: string;
   startTime: Date;
@@ -106,7 +105,10 @@ export const calculatePrice = (startTime: Date | null, endTime: Date | null, add
   const addOnPricePerHour = 2000;
   
   const addOnPrice = addOns.reduce((total, addOn) => {
-    return addOn.selected ? total + (addOnPricePerHour * hours) : total;
+    if (addOn.selected) {
+      return total + (addOnPricePerHour * hours);
+    }
+    return total;
   }, 0);
   
   return Math.round(basePrice + addOnPrice);

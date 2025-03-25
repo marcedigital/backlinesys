@@ -20,12 +20,20 @@ const TimeSlotsGrid: React.FC<TimeSlotsGridProps> = ({
   onMouseEnter,
   isInSelectionRange,
 }) => {
-  // Organizar slots en columnas - 12 horas por columna
+  // Organize slots in columns based on the number of slots
   const organizeInColumns = () => {
-    const slot1 = timeSlots.slice(0, 12); // 12am - 11am
-    const slot2 = timeSlots.slice(12, 24); // 12pm - 11pm
-    
-    return [slot1, slot2];
+    if (timeSlots.length <= 6) {
+      // For next day (6 hours or less), split into two even columns
+      const halfLength = Math.ceil(timeSlots.length / 2);
+      const column1 = timeSlots.slice(0, halfLength);
+      const column2 = timeSlots.slice(halfLength);
+      return [column1, column2];
+    } else {
+      // For current day (24 hours), split at noon (12 slots per column)
+      const slot1 = timeSlots.slice(0, 12); // 12am - 11am
+      const slot2 = timeSlots.slice(12, 24); // 12pm - 11pm
+      return [slot1, slot2];
+    }
   };
   
   const columns = organizeInColumns();
