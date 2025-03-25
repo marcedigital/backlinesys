@@ -29,7 +29,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useToast } from '@/hooks/use-toast';
 import ReservasCalendarView from './ReservasCalendarView';
 
-// Dummy data for reservations
+// Dummy data for reservations - updated for this year
 const dummyReservations = [
   {
     id: '1',
@@ -39,7 +39,7 @@ const dummyReservations = [
     time: '14:00',
     duration: 2,
     room: 'Sala 1',
-    status: 'Revisar',
+    status: 'Revisar' as const,
     paymentProof: 'https://placehold.co/600x400'
   },
   {
@@ -50,7 +50,7 @@ const dummyReservations = [
     time: '10:00',
     duration: 1,
     room: 'Sala 2',
-    status: 'Aprobada',
+    status: 'Aprobada' as const,
     paymentProof: 'https://placehold.co/600x400'
   },
   {
@@ -61,40 +61,62 @@ const dummyReservations = [
     time: '16:30',
     duration: 3,
     room: 'Sala 1',
-    status: 'Cancelada',
+    status: 'Cancelada' as const,
     paymentProof: 'https://placehold.co/600x400'
   },
   {
     id: '4',
     clientName: 'Ana Jiménez',
     email: 'ana@example.com',
-    date: '2024-03-18',
+    date: '2024-05-18',
     time: '09:00',
     duration: 2,
     room: 'Sala 2',
-    status: 'Revisar',
+    status: 'Revisar' as const,
     paymentProof: 'https://placehold.co/600x400'
   },
   {
     id: '5',
     clientName: 'Pedro Morales',
     email: 'pedro@example.com',
-    date: '2024-03-10',
+    date: '2024-06-10',
     time: '15:00',
     duration: 2,
     room: 'Sala 1',
-    status: 'Aprobada',
+    status: 'Aprobada' as const,
     paymentProof: 'https://placehold.co/600x400'
   },
   {
     id: '6',
     clientName: 'Laura Sánchez',
     email: 'laura@example.com',
-    date: '2024-03-11',
+    date: '2024-06-11',
     time: '11:30',
     duration: 1,
     room: 'Sala 2',
-    status: 'Completa',
+    status: 'Completa' as const,
+    paymentProof: 'https://placehold.co/600x400'
+  },
+  {
+    id: '7',
+    clientName: 'Roberto Gómez',
+    email: 'roberto@example.com',
+    date: '2024-07-22',
+    time: '13:00',
+    duration: 3,
+    room: 'Sala 1',
+    status: 'Revisar' as const,
+    paymentProof: 'https://placehold.co/600x400'
+  },
+  {
+    id: '8',
+    clientName: 'Carmen Díaz',
+    email: 'carmen@example.com',
+    date: '2024-08-05',
+    time: '17:00',
+    duration: 2,
+    room: 'Sala 2',
+    status: 'Aprobada' as const,
     paymentProof: 'https://placehold.co/600x400'
   }
 ];

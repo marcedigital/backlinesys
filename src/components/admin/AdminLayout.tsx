@@ -14,8 +14,8 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuSub,
-  SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarMenuSubButton,
   SidebarRail
 } from '@/components/ui/sidebar';
 import { useToast } from '@/hooks/use-toast';
@@ -82,14 +82,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       
       <SidebarMenuItem>
         <SidebarMenuButton 
-          asChild 
-          isActive={location.pathname.startsWith('/admin/reservaciones')}
           onClick={() => toggleSection('reservaciones')}
         >
-          <div className="cursor-pointer">
-            <BookOpen />
-            <span>Reservaciones</span>
-          </div>
+          <BookOpen />
+          <span>Reservaciones</span>
         </SidebarMenuButton>
         {expandedSections.reservaciones && (
           <SidebarMenuSub>
@@ -99,7 +95,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
                 isActive={isActive('/admin/reservaciones')}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <Link to="/admin/reservaciones">Gestión de Reservas</Link>
+                <Link to="/admin/reservaciones">Reservas</Link>
+              </SidebarMenuSubButton>
+            </SidebarMenuSubItem>
+            <SidebarMenuSubItem>
+              <SidebarMenuSubButton 
+                asChild 
+                isActive={location.pathname.includes('/admin/clientes')}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Link to="/admin/reservaciones?tab=clientes">Clientes</Link>
               </SidebarMenuSubButton>
             </SidebarMenuSubItem>
           </SidebarMenuSub>
@@ -108,24 +113,38 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
       
       <SidebarMenuItem>
         <SidebarMenuButton 
-          asChild 
-          isActive={location.pathname.startsWith('/admin/settings')}
           onClick={() => toggleSection('configuracion')}
         >
-          <div className="cursor-pointer">
-            <Settings />
-            <span>Configuración</span>
-          </div>
+          <Settings />
+          <span>Configuración</span>
         </SidebarMenuButton>
         {expandedSections.configuracion && (
           <SidebarMenuSub>
             <SidebarMenuSubItem>
               <SidebarMenuSubButton 
                 asChild 
-                isActive={isActive('/admin/settings')}
+                isActive={isActive('/admin/settings') && !location.pathname.includes('?tab=')}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <Link to="/admin/settings">Ajustes</Link>
+                <Link to="/admin/settings">Salas</Link>
+              </SidebarMenuSubButton>
+            </SidebarMenuSubItem>
+            <SidebarMenuSubItem>
+              <SidebarMenuSubButton 
+                asChild 
+                isActive={location.pathname.includes('/admin/settings?tab=emails')}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Link to="/admin/settings?tab=emails">Notificaciones</Link>
+              </SidebarMenuSubButton>
+            </SidebarMenuSubItem>
+            <SidebarMenuSubItem>
+              <SidebarMenuSubButton 
+                asChild 
+                isActive={location.pathname.includes('/admin/settings?tab=coupons')}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Link to="/admin/settings?tab=coupons">Cupones</Link>
               </SidebarMenuSubButton>
             </SidebarMenuSubItem>
           </SidebarMenuSub>
