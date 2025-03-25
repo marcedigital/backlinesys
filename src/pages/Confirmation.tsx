@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { toast } from "sonner";
 import { Upload, BadgePercent } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -52,8 +50,8 @@ const Confirmation: React.FC = () => {
       
       toast.success("Comprobante cargado exitosamente. Su reserva ha sido confirmada.");
       
-      // Navigate to thank you page
-      setTimeout(() => navigate("/thank-you"), 1500);
+      // Navigate to thank you page - fixed path
+      setTimeout(() => navigate("/thankyou"), 1500);
     } else {
       toast.error("Por favor cargue un comprobante de pago");
     }
