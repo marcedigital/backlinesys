@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { MusicIcon, LayoutDashboard, Settings, Calendar, LogOut } from 'lucide-react';
@@ -58,26 +58,26 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={window.location.pathname === '/admin/dashboard'}>
-                  <a href="/admin/dashboard">
+                  <Link to="/admin/dashboard">
                     <LayoutDashboard />
                     <span>Panel Principal</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={window.location.pathname === '/admin/settings'}>
-                  <a href="/admin/settings">
+                  <Link to="/admin/settings">
                     <Settings />
                     <span>Configuración</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={window.location.pathname === '/admin/calendar'}>
-                  <a href="/admin/settings">
+                  <Link to="/admin/calendar">
                     <Calendar />
                     <span>Calendario</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
