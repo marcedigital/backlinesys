@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Link } from 'react-router-dom';
-import { CalendarCheck, MusicIcon, Clock } from 'lucide-react';
+import { CalendarCheck, MusicIcon, Clock, Mail } from 'lucide-react';
 import { useBooking } from '@/context/BookingContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -28,10 +28,10 @@ const ThankYou: React.FC = () => {
           <CardHeader className="bg-gradient-to-r from-green-500/10 to-green-600/10 border-b">
             <div className="flex items-center gap-2 mb-2">
               <CalendarCheck className="h-6 w-6 text-green-600" />
-              <CardTitle className="text-2xl">¡Reserva Confirmada!</CardTitle>
+              <CardTitle className="text-2xl">¡Reserva Exitosa!</CardTitle>
             </div>
             <CardDescription>
-              Su reserva ha sido procesada correctamente. A continuación se muestran los detalles.
+              Su solicitud de reserva ha sido recibida. Por favor espere a que revisemos su comprobante de pago.
             </CardDescription>
           </CardHeader>
           
@@ -39,6 +39,15 @@ const ThankYou: React.FC = () => {
             <div className="flex items-center justify-center mb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                 <MusicIcon className="h-8 w-8 text-green-600" />
+              </div>
+            </div>
+            
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-md">
+              <div className="flex">
+                <Mail className="h-5 w-5 text-yellow-600 mr-2" />
+                <p className="text-sm text-yellow-700">
+                  Su sala ha sido reservada y será confirmada una vez que revisemos el comprobante de pago. Recibirá un correo electrónico cuando su reserva sea confirmada.
+                </p>
               </div>
             </div>
             
@@ -102,7 +111,6 @@ const ThankYou: React.FC = () => {
           
           <CardFooter className="flex flex-col space-y-4 items-center">
             <p className="text-sm text-muted-foreground text-center">
-              Recibirá un correo electrónico con los detalles de su reserva.
               Para cualquier consulta, contáctenos al teléfono 8888-8888.
             </p>
             
