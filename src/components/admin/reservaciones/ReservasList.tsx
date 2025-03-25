@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { 
   Card, 
@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Toggle } from '@/components/ui/toggle';
 import { Badge } from '@/components/ui/badge';
 import { 
   Dialog, 
@@ -47,7 +46,7 @@ const dummyReservations = [
     id: '2',
     clientName: 'María González',
     email: 'maria@example.com',
-    date: '2024-03-16',
+    date: '2024-04-16',
     time: '10:00',
     duration: 1,
     room: 'Sala 2',
@@ -58,7 +57,7 @@ const dummyReservations = [
     id: '3',
     clientName: 'Juan Pérez',
     email: 'juan@example.com',
-    date: '2024-03-17',
+    date: '2024-04-17',
     time: '16:30',
     duration: 3,
     room: 'Sala 1',
@@ -75,6 +74,28 @@ const dummyReservations = [
     room: 'Sala 2',
     status: 'Revisar',
     paymentProof: 'https://placehold.co/600x400'
+  },
+  {
+    id: '5',
+    clientName: 'Pedro Morales',
+    email: 'pedro@example.com',
+    date: '2024-03-10',
+    time: '15:00',
+    duration: 2,
+    room: 'Sala 1',
+    status: 'Aprobada',
+    paymentProof: 'https://placehold.co/600x400'
+  },
+  {
+    id: '6',
+    clientName: 'Laura Sánchez',
+    email: 'laura@example.com',
+    date: '2024-03-11',
+    time: '11:30',
+    duration: 1,
+    room: 'Sala 2',
+    status: 'Completa',
+    paymentProof: 'https://placehold.co/600x400'
   }
 ];
 
@@ -86,17 +107,34 @@ interface Reservation {
   time: string;
   duration: number;
   room: string;
-  status: 'Revisar' | 'Aprobada' | 'Cancelada';
+  status: 'Revisar' | 'Aprobada' | 'Cancelada' | 'Completa';
   paymentProof: string;
 }
 
 const ReservasList = () => {
   const [view, setView] = useState<'list' | 'calendar'>('list');
   const [searchQuery, setSearchQuery] = useState('');
-  const [reservations, setReservations] = useState<Reservation[]>(dummyReservations);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Initialize data and update status based on dates
+    const currentDate = new Date();
+    const updatedReservations = dummyReservations.map(reservation => {
+      const reservationDate = new Date(reservation.date);
+      
+      // If reservation was approved and the date has passed, mark as completed
+      if (reservation.status === 'Aprobada' && reservationDate < currentDate) {
+        return { ...reservation, status: 'Completa' as const };
+      }
+      
+      return reservation;
+    });
+    
+    setReservations(updatedReservations);
+  }, []);
 
   const handleStatusChange = (newStatus: 'Aprobada' | 'Cancelada') => {
     if (!selectedReservation) return;
@@ -130,6 +168,8 @@ const ReservasList = () => {
         return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Aprobada</Badge>;
       case 'Cancelada':
         return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">Cancelada</Badge>;
+      case 'Completa':
+        return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">Completa</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -147,6 +187,14 @@ const ReservasList = () => {
       month: 'short',
       year: 'numeric'
     }).format(date);
+  };
+
+  // Check if a reservation date is in the future
+  const isDateInFuture = (dateString: string) => {
+    const reservationDate = new Date(dateString);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return reservationDate >= today;
   };
 
   return (
@@ -305,6 +353,15 @@ const ReservasList = () => {
                     onClick={() => handleStatusChange('Aprobada')}
                   >
                     Aprobar
+                  </Button>
+                </div>
+              ) : selectedReservation.status === 'Cancelada' && isDateInFuture(selectedReservation.date) ? (
+                <div className="flex space-x-2 w-full">
+                  <Button 
+                    className="w-full" 
+                    onClick={() => handleStatusChange('Aprobada')}
+                  >
+                    Aprobar Reserva Cancelada
                   </Button>
                 </div>
               ) : (

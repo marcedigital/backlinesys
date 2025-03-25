@@ -18,7 +18,7 @@ interface Reservation {
   time: string;
   duration: number;
   room: string;
-  status: 'Revisar' | 'Aprobada' | 'Cancelada';
+  status: 'Revisar' | 'Aprobada' | 'Cancelada' | 'Completa';
   paymentProof: string;
 }
 
@@ -60,6 +60,8 @@ const ReservasCalendarView: React.FC<ReservasCalendarViewProps> = ({
         return 'bg-green-100 text-green-800 border-green-300';
       case 'Cancelada':
         return 'bg-red-100 text-red-800 border-red-300';
+      case 'Completa':
+        return 'bg-blue-100 text-blue-800 border-blue-300';
       default:
         return '';
     }
@@ -87,10 +89,11 @@ const ReservasCalendarView: React.FC<ReservasCalendarViewProps> = ({
       // Add days from the previous month
       for (let i = startingDayOfWeek - 1; i >= 0; i--) {
         const date = new Date(year, month - 1, daysInPreviousMonth - i);
+        const dateString = date.toISOString().split('T')[0];
         days.push({
           date,
           isCurrentMonth: false,
-          reservations: reservations.filter(r => r.date === date.toISOString().split('T')[0])
+          reservations: reservations.filter(r => r.date === dateString)
         });
       }
       
@@ -109,10 +112,11 @@ const ReservasCalendarView: React.FC<ReservasCalendarViewProps> = ({
       const remainingDays = 42 - days.length; // 6 rows of 7 days
       for (let i = 1; i <= remainingDays; i++) {
         const date = new Date(year, month + 1, i);
+        const dateString = date.toISOString().split('T')[0];
         days.push({
           date,
           isCurrentMonth: false,
-          reservations: reservations.filter(r => r.date === date.toISOString().split('T')[0])
+          reservations: reservations.filter(r => r.date === dateString)
         });
       }
       

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,7 +12,6 @@ import ThankYou from "./pages/ThankYou";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminSettings from "./pages/admin/AdminSettings";
-import AdminCalendar from "./pages/admin/AdminCalendar";
 import Reservaciones from "./pages/admin/Reservaciones";
 import { BookingProvider } from "./context/BookingContext";
 import { AdminAuthProvider } from "./context/AdminAuthContext";
@@ -36,7 +36,6 @@ const App = () => (
               <Route path="/admin" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
-              <Route path="/admin/calendar" element={<AdminCalendar />} />
               <Route path="/admin/reservaciones" element={<Reservaciones />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

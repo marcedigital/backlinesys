@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Eye } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type EmailNotification = {
   id: string;
@@ -15,6 +15,7 @@ type EmailNotification = {
   subject: string;
   body: string;
   enabled: boolean;
+  reminderTime?: number; // hours before the event
 };
 
 const EmailSettings = () => {
@@ -52,8 +53,9 @@ const EmailSettings = () => {
       id: 'reservation-reminder',
       name: 'Recordatorio de reserva',
       subject: 'Recordatorio de su próxima reserva',
-      body: 'Estimado cliente,\n\nLe recordamos que tiene una reserva programada para mañana. A continuación encontrará los detalles de su reserva.\n\nSaludos cordiales,\nEquipo de Sala de Ensayo',
-      enabled: false
+      body: 'Estimado cliente,\n\nLe recordamos que tiene una reserva programada próximamente. A continuación encontrará los detalles de su reserva.\n\nSaludos cordiales,\nEquipo de Sala de Ensayo',
+      enabled: false,
+      reminderTime: 24 // Default 24 hours
     }
   ]);
 
@@ -88,11 +90,12 @@ const EmailSettings = () => {
     ));
   };
 
-  const handlePreview = (notification: EmailNotification) => {
-    toast({
-      title: "Vista previa del correo",
-      description: "La función de vista previa estará disponible próximamente.",
-    });
+  const handleReminderTimeChange = (id: string, reminderTime: number) => {
+    setNotifications(notifications.map(notification => 
+      notification.id === id 
+        ? { ...notification, reminderTime } 
+        : notification
+    ));
   };
 
   const handleSave = () => {
@@ -146,6 +149,30 @@ const EmailSettings = () => {
                   disabled={!notification.enabled}
                 />
               </div>
+
+              {notification.id === 'reservation-reminder' && (
+                <div className="space-y-2">
+                  <Label htmlFor="reminder-time">Tiempo de anticipación</Label>
+                  <Select 
+                    disabled={!notification.enabled}
+                    value={notification.reminderTime?.toString()} 
+                    onValueChange={(value) => handleReminderTimeChange(notification.id, parseInt(value))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Seleccionar tiempo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 hora antes</SelectItem>
+                      <SelectItem value="2">2 horas antes</SelectItem>
+                      <SelectItem value="6">6 horas antes</SelectItem>
+                      <SelectItem value="12">12 horas antes</SelectItem>
+                      <SelectItem value="24">1 día antes</SelectItem>
+                      <SelectItem value="48">2 días antes</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              
               <div className="space-y-2">
                 <Label htmlFor={`${notification.id}-body`}>Contenido del correo</Label>
                 <Textarea 
@@ -156,16 +183,6 @@ const EmailSettings = () => {
                   disabled={!notification.enabled}
                 />
               </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="gap-1"
-                onClick={() => handlePreview(notification)}
-                disabled={!notification.enabled}
-              >
-                <Eye className="h-4 w-4" />
-                Vista previa
-              </Button>
             </AccordionContent>
           </AccordionItem>
         ))}
