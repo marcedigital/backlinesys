@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button } from '@/components/ui/button';
-import { MusicIcon, LayoutDashboard, Settings, Calendar, LogOut } from 'lucide-react';
+import { MusicIcon, LayoutDashboard, Settings, Calendar, LogOut, BookOpen, Users } from 'lucide-react';
 import { 
   SidebarProvider, 
   Sidebar, 
@@ -61,6 +61,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
                   <Link to="/admin/dashboard">
                     <LayoutDashboard />
                     <span>Panel Principal</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={window.location.pathname.startsWith('/admin/reservaciones')}>
+                  <Link to="/admin/reservaciones">
+                    <BookOpen />
+                    <span>Reservaciones</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

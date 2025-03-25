@@ -1,0 +1,323 @@
+
+import React, { useState } from 'react';
+import { Search } from 'lucide-react';
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Toggle } from '@/components/ui/toggle';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useToast } from '@/hooks/use-toast';
+import ReservasCalendarView from './ReservasCalendarView';
+
+// Dummy data for reservations
+const dummyReservations = [
+  {
+    id: '1',
+    clientName: 'Carlos Rodríguez',
+    email: 'carlos@example.com',
+    date: '2024-03-15',
+    time: '14:00',
+    duration: 2,
+    room: 'Sala 1',
+    status: 'Revisar',
+    paymentProof: 'https://placehold.co/600x400'
+  },
+  {
+    id: '2',
+    clientName: 'María González',
+    email: 'maria@example.com',
+    date: '2024-03-16',
+    time: '10:00',
+    duration: 1,
+    room: 'Sala 2',
+    status: 'Aprobada',
+    paymentProof: 'https://placehold.co/600x400'
+  },
+  {
+    id: '3',
+    clientName: 'Juan Pérez',
+    email: 'juan@example.com',
+    date: '2024-03-17',
+    time: '16:30',
+    duration: 3,
+    room: 'Sala 1',
+    status: 'Cancelada',
+    paymentProof: 'https://placehold.co/600x400'
+  },
+  {
+    id: '4',
+    clientName: 'Ana Jiménez',
+    email: 'ana@example.com',
+    date: '2024-03-18',
+    time: '09:00',
+    duration: 2,
+    room: 'Sala 2',
+    status: 'Revisar',
+    paymentProof: 'https://placehold.co/600x400'
+  }
+];
+
+interface Reservation {
+  id: string;
+  clientName: string;
+  email: string;
+  date: string;
+  time: string;
+  duration: number;
+  room: string;
+  status: 'Revisar' | 'Aprobada' | 'Cancelada';
+  paymentProof: string;
+}
+
+const ReservasList = () => {
+  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [reservations, setReservations] = useState<Reservation[]>(dummyReservations);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { toast } = useToast();
+
+  const handleStatusChange = (newStatus: 'Aprobada' | 'Cancelada') => {
+    if (!selectedReservation) return;
+    
+    const updatedReservations = reservations.map(reservation => 
+      reservation.id === selectedReservation.id 
+        ? { ...reservation, status: newStatus } 
+        : reservation
+    );
+    
+    setReservations(updatedReservations);
+    setSelectedReservation({ ...selectedReservation, status: newStatus });
+    
+    toast({
+      title: `Reserva ${newStatus === 'Aprobada' ? 'aprobada' : 'rechazada'}`,
+      description: `Se ha ${newStatus === 'Aprobada' ? 'aprobado' : 'rechazado'} la reserva de ${selectedReservation.clientName}.`,
+    });
+  };
+
+  const filteredReservations = reservations.filter(reservation => 
+    reservation.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    reservation.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    reservation.room.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'Revisar':
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">Revisar</Badge>;
+      case 'Aprobada':
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Aprobada</Badge>;
+      case 'Cancelada':
+        return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">Cancelada</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+  
+  const openReservationDetails = (reservation: Reservation) => {
+    setSelectedReservation(reservation);
+    setIsModalOpen(true);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('es-CR', { 
+      day: '2-digit', 
+      month: 'short',
+      year: 'numeric'
+    }).format(date);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
+        <div className="relative w-full md:w-72">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar reservas..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <ToggleGroup type="single" value={view} onValueChange={(value) => value && setView(value as 'list' | 'calendar')}>
+          <ToggleGroupItem value="list" aria-label="Lista">
+            Lista
+          </ToggleGroupItem>
+          <ToggleGroupItem value="calendar" aria-label="Calendario">
+            Calendario
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+
+      {view === 'list' ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Listado de Reservas</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead>Hora</TableHead>
+                  <TableHead>Duración</TableHead>
+                  <TableHead>Sala</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredReservations.map((reservation) => (
+                  <TableRow key={reservation.id} className="cursor-pointer hover:bg-muted/80">
+                    <TableCell className="font-medium" onClick={() => openReservationDetails(reservation)}>
+                      {reservation.clientName}
+                    </TableCell>
+                    <TableCell onClick={() => openReservationDetails(reservation)}>
+                      {formatDate(reservation.date)}
+                    </TableCell>
+                    <TableCell onClick={() => openReservationDetails(reservation)}>
+                      {reservation.time}
+                    </TableCell>
+                    <TableCell onClick={() => openReservationDetails(reservation)}>
+                      {reservation.duration} {reservation.duration === 1 ? 'hora' : 'horas'}
+                    </TableCell>
+                    <TableCell onClick={() => openReservationDetails(reservation)}>
+                      {reservation.room}
+                    </TableCell>
+                    <TableCell onClick={() => openReservationDetails(reservation)}>
+                      {getStatusBadge(reservation.status)}
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm" onClick={() => openReservationDetails(reservation)}>
+                        Ver detalles
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      ) : (
+        <ReservasCalendarView 
+          reservations={filteredReservations} 
+          onReservationClick={openReservationDetails}
+        />
+      )}
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        {selectedReservation && (
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Detalles de Reserva</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Cliente</p>
+                  <p className="font-medium">{selectedReservation.clientName}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Email</p>
+                  <p>{selectedReservation.email}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Fecha</p>
+                  <p>{formatDate(selectedReservation.date)}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Hora</p>
+                  <p>{selectedReservation.time}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Duración</p>
+                  <p>{selectedReservation.duration} {selectedReservation.duration === 1 ? 'hora' : 'horas'}</p>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Sala</p>
+                <p>{selectedReservation.room}</p>
+              </div>
+              
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Estado</p>
+                <div className="mt-1">{getStatusBadge(selectedReservation.status)}</div>
+              </div>
+              
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Comprobante de Pago</p>
+                <div className="mt-2">
+                  <a 
+                    href={selectedReservation.paymentProof} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline flex items-center"
+                  >
+                    <img 
+                      src={selectedReservation.paymentProof} 
+                      alt="Comprobante de pago" 
+                      className="w-full h-40 object-cover rounded-md"
+                    />
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <DialogFooter className="flex sm:justify-between">
+              {selectedReservation.status === 'Revisar' ? (
+                <div className="flex space-x-2 w-full">
+                  <Button 
+                    variant="outline" 
+                    className="w-full" 
+                    onClick={() => handleStatusChange('Cancelada')}
+                  >
+                    Rechazar
+                  </Button>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => handleStatusChange('Aprobada')}
+                  >
+                    Aprobar
+                  </Button>
+                </div>
+              ) : (
+                <Button onClick={() => setIsModalOpen(false)} className="ml-auto">
+                  Cerrar
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        )}
+      </Dialog>
+    </div>
+  );
+};
+
+export default ReservasList;
