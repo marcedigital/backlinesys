@@ -16,9 +16,12 @@ import CalendarHeader from './calendar/CalendarHeader';
 import BookingInstructions from './calendar/BookingInstructions';
 import RoomSelector from './calendar/RoomSelector';
 import RoomTimeslots from './calendar/RoomTimeslots';
+import SelectionHint from './calendar/SelectionHint';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const Calendar: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedRoom, setSelectedRoom] = useState(rooms[0].id);
   const [timeSlots, setTimeSlots] = useState<{ [roomId: string]: TimeSlotType[] }>({});
@@ -41,7 +44,7 @@ const Calendar: React.FC = () => {
     room2: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&h=800"
   };
 
-  // Cargar slots para el día actual
+  // Cargar slots para el día actual y siguiente
   useEffect(() => {
     const currentDateSlots: { [roomId: string]: TimeSlotType[] } = {};
     const nextDateSlots: { [roomId: string]: TimeSlotType[] } = {};
@@ -52,7 +55,7 @@ const Calendar: React.FC = () => {
       const unavailableTimesNextDay = getUnavailableTimes(nextDay, room.id);
       
       currentDateSlots[room.id] = generateTimeSlots(selectedDate, room.id, unavailableTimes);
-      nextDateSlots[room.id] = generateTimeSlots(nextDay, room.id, unavailableTimesNextDay);
+      nextDateSlots[room.id] = generateTimeSlots(nextDay, room.id, unavailableTimesNextDay, true); // Only 6 hours for next day
     });
     
     setTimeSlots(currentDateSlots);
@@ -60,6 +63,7 @@ const Calendar: React.FC = () => {
     resetSelection();
   }, [selectedDate]);
 
+  // Update booking details when selection changes
   useEffect(() => {
     if (selectionStart && selectionEnd) {
       const startSlot = selectionStart.startTime < selectionEnd.startTime ? selectionStart : selectionEnd;
@@ -76,6 +80,7 @@ const Calendar: React.FC = () => {
     }
   }, [selectionStart, selectionEnd, selectedRoom]);
 
+  // Calculate price when booking details change
   useEffect(() => {
     if (bookingDetails.startTime && bookingDetails.endTime) {
       const total = calculatePrice(
@@ -317,11 +322,14 @@ const Calendar: React.FC = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    resetSelection();
   };
 
   const handleConfirmBooking = () => {
     setIsModalOpen(false);
-    resetSelection();
+    
+    // After confirming add-ons, navigate to login page
+    navigate('/login');
     
     console.log('Booking confirmed:', bookingDetails);
     
@@ -349,6 +357,8 @@ const Calendar: React.FC = () => {
         onRoomChange={handleRoomChange}
         roomImages={roomImages}
       />
+      
+      <SelectionHint isSelecting={isSelecting} />
       
       <RoomTimeslots
         rooms={rooms}

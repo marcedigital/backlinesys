@@ -36,10 +36,15 @@ export const rooms: Room[] = [
 ];
 
 // Generate time slots for a specific day and room
-export const generateTimeSlots = (date: Date, roomId: string, unavailableTimes: Array<[Date, Date]> = []): TimeSlot[] => {
+export const generateTimeSlots = (date: Date, roomId: string, unavailableTimes: Array<[Date, Date]> = [], isNextDay: boolean = false): TimeSlot[] => {
   const slots: TimeSlot[] = [];
   const startHour = 0; // 12 AM
-  const endHour = 24; // 12 AM next day
+  let endHour = 24; // 12 AM next day
+  
+  // If it's the next day, only generate first 6 hours
+  if (isNextDay) {
+    endHour = 6; // Only show until 6 AM for next day
+  }
   
   // Solo generar slots para horas completas
   for (let hour = startHour; hour < endHour; hour++) {
@@ -84,31 +89,24 @@ export const calculateDuration = (startTime: Date, endTime: Date): number => {
 export const calculatePrice = (startTime: Date | null, endTime: Date | null, addOns: AddOn[]): number => {
   if (!startTime || !endTime) return 0;
   
-  // Calculate duration in minutes
+  // Calculate duration in hours
   const durationInMinutes = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
-  const hours = Math.floor(durationInMinutes / 60);
-  const halfHours = Math.floor((durationInMinutes % 60) / 30);
+  const hours = Math.ceil(durationInMinutes / 60); // Round up to whole hours
   
   // Base price:
   // ¢10.000 for the first hour
   // ¢5.000 for each additional hour
-  // ¢2.500 for each additional half hour
   let basePrice = 10000; // First hour
   
   if (hours > 1) {
     basePrice += (hours - 1) * 5000; // Additional full hours
   }
   
-  if (halfHours > 0) {
-    basePrice += halfHours * 2500; // Additional half hours
-  }
-  
   // Add price of selected add-ons (¢2.000 per hour per add-on)
   const addOnPricePerHour = 2000;
-  const totalHours = Math.ceil(durationInMinutes / 60); // Round up to nearest hour for add-ons
   
   const addOnPrice = addOns.reduce((total, addOn) => {
-    return addOn.selected ? total + (addOnPricePerHour * totalHours) : total;
+    return addOn.selected ? total + (addOnPricePerHour * hours) : total;
   }, 0);
   
   return Math.round(basePrice + addOnPrice);
