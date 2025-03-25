@@ -7,6 +7,7 @@ import AddOnItem from './AddOnItem';
 import { cn } from '@/lib/utils';
 import { CalendarClock, Clock, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useBooking } from '@/context/BookingContext';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -24,11 +25,12 @@ const BookingModal: React.FC<BookingModalProps> = ({
   onConfirm,
 }) => {
   const { startTime, endTime, addOns, totalPrice } = bookingDetails;
-
-  // Removed useEffect that was causing the issue
-  // The calculation is now done in the parent component
+  const { setBookingData } = useBooking();
 
   const handleConfirm = () => {
+    // Store booking details in context
+    setBookingData({...bookingDetails});
+    
     toast.success('Booking confirmed!', {
       description: `Your music rehearsal room has been booked successfully.`,
     });

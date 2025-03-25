@@ -1,34 +1,27 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from "sonner";
 import { Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useBooking } from '@/context/BookingContext';
+import { format } from 'date-fns';
 
 const Confirmation: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { bookingData, setPaymentProofImage } = useBooking();
   
-  // This would come from the booking state in a real app
-  const bookingDetails = {
-    room: "Sala A - Rock",
-    date: new Date().toLocaleDateString("es-ES", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-    startTime: "19:00",
-    endTime: "22:00",
-    hours: 3,
-    basePrice: 10000,
-    additionalHours: 2,
-    additionalHoursPrice: 10000,
-    addOns: [
-      { name: "Amplificador de guitarra", price: 5000 },
-      { name: "Micrófono profesional", price: 3000 }
-    ],
-    total: 28000
-  };
-
+  // Redirect if no booking data
+  useEffect(() => {
+    if (!bookingData) {
+      navigate('/');
+    }
+  }, [bookingData, navigate]);
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
@@ -43,13 +36,44 @@ const Confirmation: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (file) {
+      // Store the image URL (in a real app, this would be uploaded to a server)
+      setPaymentProofImage(preview);
+      
       toast.success("Comprobante cargado exitosamente. Su reserva ha sido confirmada.");
-      // In a real app, we would upload the file to a server here
-      setTimeout(() => navigate("/"), 2000);
+      
+      // Navigate to thank you page
+      setTimeout(() => navigate("/thank-you"), 1500);
     } else {
       toast.error("Por favor cargue un comprobante de pago");
     }
   };
+  
+  // Format currency as Costa Rican Colones
+  const formatCurrency = (amount: number) => {
+    return `₡${amount.toLocaleString('es-CR')}`;
+  };
+  
+  if (!bookingData) {
+    return null; // Don't render anything if no booking data (will redirect via useEffect)
+  }
+  
+  // Calculate hours difference
+  const calculateHours = () => {
+    if (!bookingData.startTime || !bookingData.endTime) return 0;
+    const diffMs = bookingData.endTime.getTime() - bookingData.startTime.getTime();
+    return Math.round(diffMs / (1000 * 60 * 60));
+  };
+  
+  const totalHours = calculateHours();
+  const basePrice = 10000;
+  const additionalHoursPrice = totalHours > 1 ? (totalHours - 1) * 5000 : 0;
+  
+  // Calculate add-ons total
+  const addOnsTotal = bookingData.addOns
+    .filter(addon => addon.selected)
+    .reduce((sum, addon) => sum + addon.price, 0);
+  
+  const total = basePrice + additionalHoursPrice + addOnsTotal;
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -80,19 +104,27 @@ const Confirmation: React.FC = () => {
               <div className="grid grid-cols-2 gap-4 py-2">
                 <div>
                   <p className="text-sm text-muted-foreground">Sala:</p>
-                  <p className="font-medium">{bookingDetails.room}</p>
+                  <p className="font-medium">{bookingData.room}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Fecha:</p>
-                  <p className="font-medium">{bookingDetails.date}</p>
+                  <p className="font-medium">
+                    {bookingData.startTime ? 
+                      format(bookingData.startTime, "EEEE, d MMMM yyyy") : 
+                      "No disponible"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Hora de inicio:</p>
-                  <p className="font-medium">{bookingDetails.startTime}</p>
+                  <p className="font-medium">
+                    {bookingData.startTime ? format(bookingData.startTime, "HH:mm") : "No disponible"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Hora de fin:</p>
-                  <p className="font-medium">{bookingDetails.endTime}</p>
+                  <p className="font-medium">
+                    {bookingData.endTime ? format(bookingData.endTime, "HH:mm") : "No disponible"}
+                  </p>
                 </div>
               </div>
               
@@ -104,20 +136,24 @@ const Confirmation: React.FC = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Primera hora</span>
-                    <span>₡{bookingDetails.basePrice.toLocaleString()}</span>
+                    <span>{formatCurrency(basePrice)}</span>
                   </div>
                   
-                  <div className="flex justify-between">
-                    <span>Horas adicionales ({bookingDetails.additionalHours} x ₡5,000)</span>
-                    <span>₡{bookingDetails.additionalHoursPrice.toLocaleString()}</span>
-                  </div>
-                  
-                  {bookingDetails.addOns.map((addon, index) => (
-                    <div key={index} className="flex justify-between">
-                      <span>{addon.name}</span>
-                      <span>₡{addon.price.toLocaleString()}</span>
+                  {totalHours > 1 && (
+                    <div className="flex justify-between">
+                      <span>Horas adicionales ({totalHours - 1} x ₡5,000)</span>
+                      <span>{formatCurrency(additionalHoursPrice)}</span>
                     </div>
-                  ))}
+                  )}
+                  
+                  {bookingData.addOns
+                    .filter(addon => addon.selected)
+                    .map((addon, index) => (
+                      <div key={index} className="flex justify-between">
+                        <span>{addon.name}</span>
+                        <span>{formatCurrency(addon.price)}</span>
+                      </div>
+                    ))}
                 </div>
               </div>
               
@@ -125,7 +161,7 @@ const Confirmation: React.FC = () => {
               
               <div className="flex justify-between text-lg font-bold">
                 <span>Total</span>
-                <span>₡{bookingDetails.total.toLocaleString()}</span>
+                <span>{formatCurrency(total)}</span>
               </div>
             </div>
           </CardContent>

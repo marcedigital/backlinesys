@@ -7,11 +7,20 @@ import { Label } from '@/components/ui/label';
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { useBooking } from '@/context/BookingContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { bookingData } = useBooking();
+
+  // Redirect if no booking data
+  React.useEffect(() => {
+    if (!bookingData) {
+      navigate('/');
+    }
+  }, [bookingData, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
