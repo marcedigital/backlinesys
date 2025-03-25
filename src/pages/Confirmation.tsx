@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { toast } from "sonner";
-import { Upload } from 'lucide-react';
+import { Upload, BadgePercent } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useBooking } from '@/context/BookingContext';
 import { format } from 'date-fns';
@@ -12,8 +14,17 @@ import { format } from 'date-fns';
 const Confirmation: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [couponInput, setCouponInput] = useState<string>('');
   const navigate = useNavigate();
-  const { bookingData, setPaymentProofImage } = useBooking();
+  
+  const { 
+    bookingData, 
+    setPaymentProofImage, 
+    couponCode, 
+    setCouponCode, 
+    discountPercentage, 
+    setDiscountPercentage 
+  } = useBooking();
   
   // Redirect if no booking data
   useEffect(() => {
@@ -48,6 +59,20 @@ const Confirmation: React.FC = () => {
     }
   };
   
+  const handleCouponApply = () => {
+    const couponCode = couponInput.trim().toUpperCase();
+    
+    if (couponCode === "20OFF") {
+      setCouponCode(couponCode);
+      setDiscountPercentage(20);
+      toast.success("Cupón aplicado: 20% de descuento");
+    } else {
+      setCouponCode(null);
+      setDiscountPercentage(0);
+      toast.error("Cupón inválido o expirado");
+    }
+  };
+  
   // Format currency as Costa Rican Colones
   const formatCurrency = (amount: number) => {
     return `₡${amount.toLocaleString('es-CR')}`;
@@ -73,7 +98,9 @@ const Confirmation: React.FC = () => {
     .filter(addon => addon.selected)
     .reduce((sum, addon) => sum + addon.price, 0);
   
-  const total = basePrice + additionalHoursPrice + addOnsTotal;
+  const subtotal = basePrice + additionalHoursPrice + addOnsTotal;
+  const discountAmount = discountPercentage > 0 ? (subtotal * discountPercentage / 100) : 0;
+  const total = subtotal - discountAmount;
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -128,6 +155,39 @@ const Confirmation: React.FC = () => {
                 </div>
               </div>
               
+              {/* Coupon Section */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-center mb-2">
+                  <BadgePercent className="w-5 h-5 mr-2 text-booking-blue" />
+                  <h3 className="text-lg font-semibold">Cupón de Descuento</h3>
+                </div>
+                
+                <div className="flex gap-2">
+                  <div className="grow">
+                    <Input
+                      type="text"
+                      placeholder="Ingrese su código de cupón"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleCouponApply}
+                    variant="outline"
+                    className="shrink-0 border-booking-blue text-booking-blue hover:bg-booking-blue/10"
+                  >
+                    Aplicar
+                  </Button>
+                </div>
+                
+                {couponCode && (
+                  <div className="mt-2 text-sm font-medium text-green-600 flex items-center">
+                    <span>Cupón aplicado: {discountPercentage}% de descuento</span>
+                  </div>
+                )}
+              </div>
+              
               <Separator />
               
               <div>
@@ -154,6 +214,19 @@ const Confirmation: React.FC = () => {
                         <span>{formatCurrency(addon.price)}</span>
                       </div>
                     ))}
+                    
+                  {discountPercentage > 0 && (
+                    <>
+                      <div className="flex justify-between pt-2">
+                        <span>Subtotal</span>
+                        <span>{formatCurrency(subtotal)}</span>
+                      </div>
+                      <div className="flex justify-between text-green-600">
+                        <span>Descuento ({discountPercentage}%)</span>
+                        <span>-{formatCurrency(discountAmount)}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               

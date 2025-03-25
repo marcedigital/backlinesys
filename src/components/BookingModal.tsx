@@ -25,11 +25,15 @@ const BookingModal: React.FC<BookingModalProps> = ({
   onConfirm,
 }) => {
   const { startTime, endTime, addOns, totalPrice } = bookingDetails;
-  const { setBookingData } = useBooking();
+  const { setBookingData, setCouponCode, setDiscountPercentage } = useBooking();
 
   const handleConfirm = () => {
     // Store booking details in context
     setBookingData({...bookingDetails});
+    
+    // Reset any previous coupon when making a new booking
+    setCouponCode(null);
+    setDiscountPercentage(0);
     
     toast.success('Booking confirmed!', {
       description: `Your music rehearsal room has been booked successfully.`,
