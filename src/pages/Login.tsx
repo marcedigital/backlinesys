@@ -1,16 +1,29 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from "sonner";
 
 const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
+    
+    // For demo purposes, accept any login credentials
+    if (email && password) {
+      toast.success("Login successful");
+      // Navigate to confirmation page
+      navigate('/confirmation');
+    } else {
+      toast.error("Please enter email and password");
+    }
   };
 
   return (
@@ -36,11 +49,24 @@ const Login: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Correo electrónico</Label>
-                <Input id="email" type="email" placeholder="correo@ejemplo.com" required />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="correo@ejemplo.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required 
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required 
+                />
               </div>
               <Button type="submit" className="w-full bg-booking-blue hover:bg-booking-blue/90">
                 Iniciar sesión
@@ -56,7 +82,14 @@ const Login: React.FC = () => {
               </div>
             </div>
             
-            <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center justify-center gap-2"
+              onClick={() => {
+                toast.success("Google login successful");
+                navigate('/confirmation');
+              }}
+            >
               <FcGoogle className="h-5 w-5" />
               <span>Google</span>
             </Button>
