@@ -21,15 +21,13 @@ const TimeSlot: React.FC<TimeSlotProps> = ({
   onSelectEnd,
   onMouseEnter,
 }) => {
-  const handleMouseDown = () => {
-    if (slot.isAvailable) {
-      onSelectStart(slot);
-    }
-  };
-
-  const handleMouseUp = () => {
-    if (isSelecting && slot.isAvailable) {
+  const handleClick = () => {
+    if (!slot.isAvailable) return;
+    
+    if (isSelecting) {
       onSelectEnd(slot);
+    } else {
+      onSelectStart(slot);
     }
   };
 
@@ -44,11 +42,9 @@ const TimeSlot: React.FC<TimeSlotProps> = ({
         slot.isAvailable ? 'cursor-pointer hover:shadow-md' : 'cursor-not-allowed',
         slot.isSelected ? 'border-booking-purple bg-booking-purple bg-opacity-10 text-booking-purple' : 'border-transparent',
         isInSelectionRange && slot.isAvailable ? 'bg-booking-purple bg-opacity-10 border-booking-purple' : '',
-        !slot.isAvailable && 'bg-booking-gray text-booking-dark-gray',
-        isSelecting && 'cursor-ns-resize'
+        !slot.isAvailable && 'bg-booking-gray text-booking-dark-gray'
       )}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
+      onClick={handleClick}
       onMouseEnter={handleMouseEnter}
     >
       <div className="flex justify-between items-center">

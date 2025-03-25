@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { addDays, subDays } from 'date-fns';
 import {
@@ -16,7 +15,6 @@ import CalendarHeader from './calendar/CalendarHeader';
 import BookingInstructions from './calendar/BookingInstructions';
 import RoomSelector from './calendar/RoomSelector';
 import RoomTimeslots from './calendar/RoomTimeslots';
-import SelectionHint from './calendar/SelectionHint';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -147,11 +145,18 @@ const Calendar: React.FC = () => {
   const handleSelectStart = (slot: TimeSlotType) => {
     if (!slot.isAvailable) return;
     
+    // If we're already in selecting mode, treat this as selecting the end slot
+    if (isSelecting && selectionStart) {
+      handleSelectEnd(slot);
+      return;
+    }
+    
+    // Otherwise, start a new selection
     setIsSelecting(true);
     setSelectionStart(slot);
     setTempSelectionEnd(slot);
     
-    // Marcar como seleccionado en el día actual o en el día siguiente
+    // Highlight the selected start slot
     const isCurrentDaySlot = timeSlots[selectedRoom]?.some(s => s.id === slot.id);
     
     if (isCurrentDaySlot) {
@@ -176,11 +181,22 @@ const Calendar: React.FC = () => {
   const handleSelectEnd = (slot: TimeSlotType) => {
     if (!isSelecting || !slot.isAvailable || !selectionStart) return;
     
-    // Determinar si los slots están en el mismo día o en días diferentes
+    // Don't allow selecting the same slot as start and end
+    if (slot.id === selectionStart.id) {
+      return;
+    }
+    
+    // Determine if the slots are in the same day or different days
     const isStartInCurrentDay = timeSlots[selectedRoom]?.some(s => s.id === selectionStart.id);
     const isEndInCurrentDay = timeSlots[selectedRoom]?.some(s => s.id === slot.id);
     
-    // Si ambos están en el mismo día, verificar continuidad
+    // Ensure end slot is after start slot
+    if (slot.startTime < selectionStart.startTime) {
+      toast.error("La hora final debe ser después de la hora inicial");
+      return;
+    }
+    
+    // If both are in the same day, verify continuity
     if (isStartInCurrentDay && isEndInCurrentDay) {
       const currentDaySlots = timeSlots[selectedRoom] || [];
       if (!areSlotsContinuous(currentDaySlots, selectionStart, slot)) {
@@ -189,7 +205,7 @@ const Calendar: React.FC = () => {
         return;
       }
       
-      // Marcar selección en el día actual
+      // Mark selection in current day
       const startIndex = currentDaySlots.findIndex(s => s.id === selectionStart.id);
       const endIndex = currentDaySlots.findIndex(s => s.id === slot.id);
       
@@ -206,21 +222,21 @@ const Calendar: React.FC = () => {
         }));
       }
     } 
-    // Si selección cruza días, verificar continuidad especial
+    // If selection crosses days, verify special continuity
     else if ((isStartInCurrentDay && !isEndInCurrentDay) || (!isStartInCurrentDay && isEndInCurrentDay)) {
       const currentDaySlots = timeSlots[selectedRoom] || [];
       const nextDaySlots = nextDayTimeSlots[selectedRoom] || [];
       
-      // Verificar si la selección cruza la medianoche de manera válida
+      // Verify if the selection validly crosses midnight
       if (isStartInCurrentDay) {
-        // Selección desde día actual hasta día siguiente
+        // Selection from current day to next day
         const startIndex = currentDaySlots.findIndex(s => s.id === selectionStart.id);
         const endIndex = nextDaySlots.findIndex(s => s.id === slot.id);
         
         if (startIndex !== -1 && endIndex !== -1) {
-          // Verificar que todos los slots desde startIndex hasta el final del día actual estén disponibles
+          // Verify that all slots from startIndex to the end of current day are available
           const isValidInCurrentDay = currentDaySlots.slice(startIndex).every(s => s.isAvailable);
-          // Verificar que todos los slots desde el inicio del día siguiente hasta endIndex estén disponibles
+          // Verify that all slots from the beginning of next day to endIndex are available
           const isValidInNextDay = nextDaySlots.slice(0, endIndex + 1).every(s => s.isAvailable);
           
           if (!isValidInCurrentDay || !isValidInNextDay) {
@@ -229,7 +245,7 @@ const Calendar: React.FC = () => {
             return;
           }
           
-          // Marcar slots seleccionados en ambos días
+          // Mark selected slots in both days
           setTimeSlots(prev => ({
             ...prev,
             [selectedRoom]: prev[selectedRoom].map((s, i) => ({
@@ -247,19 +263,13 @@ const Calendar: React.FC = () => {
           }));
         }
       } else {
-        // Selección desde día siguiente hasta día actual
-        const startIndex = nextDaySlots.findIndex(s => s.id === selectionStart.id);
-        const endIndex = currentDaySlots.findIndex(s => s.id === slot.id);
-        
-        if (startIndex !== -1 && endIndex !== -1) {
-          // Verificar continuidad (no implementado en este caso por complejidad)
-          toast.error("La selección de días en orden inverso no está soportada");
-          resetSelection();
-          return;
-        }
+        // Selection from next day to current day (not supported)
+        toast.error("La selección de días en orden inverso no está soportada");
+        resetSelection();
+        return;
       }
     }
-    // Si ambos están en el día siguiente, verificar continuidad
+    // If both are in the next day, verify continuity
     else if (!isStartInCurrentDay && !isEndInCurrentDay) {
       const nextDaySlots = nextDayTimeSlots[selectedRoom] || [];
       if (!areSlotsContinuous(nextDaySlots, selectionStart, slot)) {
@@ -268,7 +278,7 @@ const Calendar: React.FC = () => {
         return;
       }
       
-      // Marcar selección en el día siguiente
+      // Mark selection in the next day
       const startIndex = nextDaySlots.findIndex(s => s.id === selectionStart.id);
       const endIndex = nextDaySlots.findIndex(s => s.id === slot.id);
       
@@ -301,6 +311,8 @@ const Calendar: React.FC = () => {
   const isInSelectionRange = (slot: TimeSlotType) => {
     if (!isSelecting || !selectionStart || !tempSelectionEnd) return false;
     
+    // Only highlight slots between start and temp end
+    // Make sure the highlighting works correctly regardless of order
     const startTime = selectionStart.startTime;
     const endTime = tempSelectionEnd.startTime;
     
@@ -357,8 +369,6 @@ const Calendar: React.FC = () => {
         onRoomChange={handleRoomChange}
         roomImages={roomImages}
       />
-      
-      <SelectionHint isSelecting={isSelecting} />
       
       <RoomTimeslots
         rooms={rooms}
