@@ -27,7 +27,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center">
         <Music className="mr-2 h-5 w-5 text-accent" />
-        <h2 className="text-xl font-semibold">Music Rehearsal Room Booking</h2>
+        <h2 className="text-xl font-semibold">Backline Studios - Reserva de Salas</h2>
       </div>
       
       <Popover>

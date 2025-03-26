@@ -374,24 +374,11 @@ const Calendar: React.FC = () => {
         roomImages={roomImages}
       />
       
-      <RoomTimeslots
-        rooms={rooms}
-        selectedRoom={selectedRoom}
-        timeSlots={timeSlots}
-        isSelecting={isSelecting}
-        onRoomChange={handleRoomChange}
-        onSelectStart={handleSelectStart}
-        onSelectEnd={handleSelectEnd}
-        onMouseEnter={handleMouseEnter}
-        isInSelectionRange={isInSelectionRange}
-      />
-      
-      <div className="mt-8">
-        <h3 className="text-lg font-medium mb-4">Horas disponibles - Siguiente día</h3>
+      <div className="calendar-background p-4 rounded-xl mt-6 mb-6">
         <RoomTimeslots
           rooms={rooms}
           selectedRoom={selectedRoom}
-          timeSlots={nextDayTimeSlots}
+          timeSlots={timeSlots}
           isSelecting={isSelecting}
           onRoomChange={handleRoomChange}
           onSelectStart={handleSelectStart}
@@ -399,6 +386,21 @@ const Calendar: React.FC = () => {
           onMouseEnter={handleMouseEnter}
           isInSelectionRange={isInSelectionRange}
         />
+        
+        <div className="mt-8">
+          <h3 className="text-lg font-medium mb-4">Horas disponibles - Siguiente día</h3>
+          <RoomTimeslots
+            rooms={rooms}
+            selectedRoom={selectedRoom}
+            timeSlots={nextDayTimeSlots}
+            isSelecting={isSelecting}
+            onRoomChange={handleRoomChange}
+            onSelectStart={handleSelectStart}
+            onSelectEnd={handleSelectEnd}
+            onMouseEnter={handleMouseEnter}
+            isInSelectionRange={isInSelectionRange}
+          />
+        </div>
       </div>
       
       <BookingModal

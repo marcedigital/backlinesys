@@ -147,4 +147,8 @@
     transform: translateY(-10px);
     transition: opacity 300ms, transform 300ms;
   }
+  
+  .calendar-background {
+    background: linear-gradient(to right, rgba(255, 212, 0, 0.05), rgba(0, 255, 229, 0.1));
+  }
 }
