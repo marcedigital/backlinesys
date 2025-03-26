@@ -7,6 +7,7 @@ const Index: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Main content */}
       <main className="flex-1 container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6 text-center">Backline Studios - Reserva de Salas</h1>
         <Calendar />
       </main>
       

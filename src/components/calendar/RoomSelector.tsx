@@ -42,7 +42,7 @@ const RoomSelector: React.FC<RoomSelectorProps> = ({
             </AspectRatio>
             <div className={cn(
               "p-4",
-              selectedRoom === room.id ? "bg-accent text-accent-foreground" : "bg-white"
+              selectedRoom === room.id ? "bg-accent text-white" : "bg-white"
             )}>
               <div className="flex items-center">
                 {room.id === 'room1' ? <Mic className="mr-2 h-4 w-4" /> : <Headphones className="mr-2 h-4 w-4" />}

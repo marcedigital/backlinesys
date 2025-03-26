@@ -221,24 +221,31 @@ const ReservasList = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
-        <div className="relative w-full md:w-72">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar reservas..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex flex-1 flex-col sm:flex-row sm:items-center gap-2">
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar reservas..."
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <ToggleGroup 
+            type="single" 
+            value={view} 
+            onValueChange={(value) => value && setView(value as 'list' | 'calendar')}
+            className="h-9" 
+          >
+            <ToggleGroupItem value="list" aria-label="Lista">
+              Lista
+            </ToggleGroupItem>
+            <ToggleGroupItem value="calendar" aria-label="Calendario">
+              Calendario
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
-        <ToggleGroup type="single" value={view} onValueChange={(value) => value && setView(value as 'list' | 'calendar')}>
-          <ToggleGroupItem value="list" aria-label="Lista">
-            Lista
-          </ToggleGroupItem>
-          <ToggleGroupItem value="calendar" aria-label="Calendario">
-            Calendario
-          </ToggleGroupItem>
-        </ToggleGroup>
       </div>
 
       {view === 'list' ? (
@@ -246,15 +253,15 @@ const ReservasList = () => {
           <CardHeader>
             <CardTitle>Listado de Reservas</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-0 sm:px-6 overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Cliente</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead>Hora</TableHead>
-                  <TableHead>Duración</TableHead>
-                  <TableHead>Sala</TableHead>
+                  <TableHead className="hidden sm:table-cell">Fecha</TableHead>
+                  <TableHead className="hidden sm:table-cell">Hora</TableHead>
+                  <TableHead className="hidden sm:table-cell">Duración</TableHead>
+                  <TableHead className="hidden sm:table-cell">Sala</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead>Acciones</TableHead>
                 </TableRow>
@@ -264,17 +271,20 @@ const ReservasList = () => {
                   <TableRow key={reservation.id} className="cursor-pointer hover:bg-muted/80">
                     <TableCell className="font-medium" onClick={() => openReservationDetails(reservation)}>
                       {reservation.clientName}
+                      <div className="block sm:hidden text-xs text-gray-500 mt-1">
+                        {formatDate(reservation.date)} · {reservation.time} · {reservation.room}
+                      </div>
                     </TableCell>
-                    <TableCell onClick={() => openReservationDetails(reservation)}>
+                    <TableCell className="hidden sm:table-cell" onClick={() => openReservationDetails(reservation)}>
                       {formatDate(reservation.date)}
                     </TableCell>
-                    <TableCell onClick={() => openReservationDetails(reservation)}>
+                    <TableCell className="hidden sm:table-cell" onClick={() => openReservationDetails(reservation)}>
                       {reservation.time}
                     </TableCell>
-                    <TableCell onClick={() => openReservationDetails(reservation)}>
+                    <TableCell className="hidden sm:table-cell" onClick={() => openReservationDetails(reservation)}>
                       {reservation.duration} {reservation.duration === 1 ? 'hora' : 'horas'}
                     </TableCell>
-                    <TableCell onClick={() => openReservationDetails(reservation)}>
+                    <TableCell className="hidden sm:table-cell" onClick={() => openReservationDetails(reservation)}>
                       {reservation.room}
                     </TableCell>
                     <TableCell onClick={() => openReservationDetails(reservation)}>
@@ -282,7 +292,7 @@ const ReservasList = () => {
                     </TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" onClick={() => openReservationDetails(reservation)}>
-                        Ver detalles
+                        Ver
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -305,14 +315,14 @@ const ReservasList = () => {
               <DialogTitle>Detalles de Reserva</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Cliente</p>
                   <p className="font-medium">{selectedReservation.clientName}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Email</p>
-                  <p>{selectedReservation.email}</p>
+                  <p className="break-all">{selectedReservation.email}</p>
                 </div>
               </div>
               

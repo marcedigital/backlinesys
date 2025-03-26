@@ -14,12 +14,12 @@ const BookingInstructions: React.FC = () => {
       className={`bg-gradient-to-r from-accent/20 to-primary/20 p-4 rounded-lg mb-6 text-sm border border-primary`}
     >
       <div className="flex items-center justify-between">
-        <h3 className="font-medium text-black">Cómo reservar:</h3>
+        <h3 className="font-medium text-black text-base">Cómo reservar:</h3>
         <CollapsibleTrigger asChild>
           <Button 
             variant="ghost" 
             size="sm"
-            className={isOpen ? "" : "bg-primary/20 hover:bg-primary/30"}
+            className={isOpen ? "" : "bg-primary hover:bg-primary/80"}
           >
             {isOpen ? (
               <ChevronUp className="h-4 w-4" />

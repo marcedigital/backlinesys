@@ -51,7 +51,7 @@ const TimeSlotsGrid: React.FC<TimeSlotsGridProps> = ({
   return (
     <div className="bg-gradient-to-r from-[rgba(255,212,0,0.05)] to-[rgba(0,255,229,0.1)] p-4 rounded-lg">
       {selectedDate && onDateChange && (
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-start mb-4">
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -65,7 +65,7 @@ const TimeSlotsGrid: React.FC<TimeSlotsGridProps> = ({
                 {format(selectedDate, 'MMMM d, yyyy')}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 z-50 bg-white" align="end">
+            <PopoverContent className="w-auto p-0 z-50 bg-white" align="start">
               <Calendar
                 mode="single"
                 selected={selectedDate}
