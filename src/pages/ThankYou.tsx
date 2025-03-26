@@ -14,18 +14,12 @@ const ThankYou: React.FC = () => {
   
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-accent/90 to-accent text-white py-6">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold">Music Rehearsal Room Scheduler</h1>
-          <p className="mt-2 opacity-90">¡Gracias por su reserva!</p>
-        </div>
-      </header>
-      
       {/* Main content */}
       <main className="flex-1 container mx-auto px-4 py-8 flex flex-col items-center justify-center">
+        <h1 className="text-4xl font-bold mb-6 text-center">Backline Studios - Reserva de Salas</h1>
+        
         <Card className="w-full max-w-2xl">
-          <CardHeader className="bg-gradient-to-r from-green-500/10 to-green-600/10 border-b">
+          <CardHeader className="border-b">
             <div className="flex items-center gap-2 mb-2">
               <CalendarCheck className="h-6 w-6 text-green-600" />
               <CardTitle className="text-2xl text-black">¡Reserva Exitosa!</CardTitle>
@@ -42,9 +36,9 @@ const ThankYou: React.FC = () => {
               </div>
             </div>
             
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-md">
+            <div className="bg-gradient-to-r from-primary/30 to-accent/30 border-l-4 border-primary p-4 mb-6 rounded-md">
               <div className="flex">
-                <Mail className="h-5 w-5 text-yellow-600 mr-2" />
+                <Mail className="h-5 w-5 text-accent mr-2" />
                 <p className="text-sm text-gray-700">
                   Su sala ha sido reservada y será confirmada una vez que revisemos el comprobante de pago. Recibirá un correo electrónico cuando su reserva sea confirmada.
                 </p>
@@ -126,7 +120,7 @@ const ThankYou: React.FC = () => {
       {/* Footer */}
       <footer className="bg-white border-t border-border py-4 mt-8">
         <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-          Music Rehearsal Scheduler &copy; {new Date().getFullYear()}
+          Backline Studios &copy; {new Date().getFullYear()}
         </div>
       </footer>
     </div>
