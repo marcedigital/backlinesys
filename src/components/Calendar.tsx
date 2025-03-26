@@ -374,32 +374,49 @@ const Calendar: React.FC = () => {
         roomImages={roomImages}
       />
       
-      <div className="calendar-background p-4 rounded-xl mt-6 mb-6">
-        <RoomTimeslots
-          rooms={rooms}
-          selectedRoom={selectedRoom}
-          timeSlots={timeSlots}
-          isSelecting={isSelecting}
-          onRoomChange={handleRoomChange}
-          onSelectStart={handleSelectStart}
-          onSelectEnd={handleSelectEnd}
-          onMouseEnter={handleMouseEnter}
-          isInSelectionRange={isInSelectionRange}
-        />
-        
-        <div className="mt-8">
-          <h3 className="text-lg font-medium mb-4">Horas disponibles - Siguiente día</h3>
-          <RoomTimeslots
-            rooms={rooms}
-            selectedRoom={selectedRoom}
-            timeSlots={nextDayTimeSlots}
-            isSelecting={isSelecting}
-            onRoomChange={handleRoomChange}
-            onSelectStart={handleSelectStart}
-            onSelectEnd={handleSelectEnd}
-            onMouseEnter={handleMouseEnter}
-            isInSelectionRange={isInSelectionRange}
+      <div className="mt-6 mb-6">
+        <div className="flex justify-end mb-4">
+          <CalendarHeader 
+            selectedDate={selectedDate}
+            onDateChange={handleDateChange}
+            calendarOnly={true}
           />
+        </div>
+        
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-border">
+          <h3 className="text-lg font-medium mb-4">Horas disponibles - {rooms.find(r => r.id === selectedRoom)?.name}</h3>
+          
+          <div className="bg-gradient-to-r from-[rgba(255,212,0,0.05)] to-[rgba(0,255,229,0.1)] p-4 rounded-lg">
+            <RoomTimeslots
+              rooms={rooms}
+              selectedRoom={selectedRoom}
+              timeSlots={timeSlots}
+              isSelecting={isSelecting}
+              onRoomChange={handleRoomChange}
+              onSelectStart={handleSelectStart}
+              onSelectEnd={handleSelectEnd}
+              onMouseEnter={handleMouseEnter}
+              isInSelectionRange={isInSelectionRange}
+            />
+          </div>
+        </div>
+        
+        <div className="mt-8 bg-white rounded-xl p-4 shadow-sm border border-border">
+          <h3 className="text-lg font-medium mb-4">Horas disponibles - Siguiente día</h3>
+          
+          <div className="bg-gradient-to-r from-[rgba(255,212,0,0.05)] to-[rgba(0,255,229,0.1)] p-4 rounded-lg">
+            <RoomTimeslots
+              rooms={rooms}
+              selectedRoom={selectedRoom}
+              timeSlots={nextDayTimeSlots}
+              isSelecting={isSelecting}
+              onRoomChange={handleRoomChange}
+              onSelectStart={handleSelectStart}
+              onSelectEnd={handleSelectEnd}
+              onMouseEnter={handleMouseEnter}
+              isInSelectionRange={isInSelectionRange}
+            />
+          </div>
         </div>
       </div>
       

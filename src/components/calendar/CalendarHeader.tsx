@@ -14,22 +14,19 @@ import { cn } from '@/lib/utils';
 interface CalendarHeaderProps {
   selectedDate: Date;
   onDateChange: (date: Date) => void;
+  calendarOnly?: boolean;
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   selectedDate,
   onDateChange,
+  calendarOnly = false,
 }) => {
   const today = new Date();
   const threeMonthsLater = addMonths(today, 3);
 
-  return (
-    <div className="flex justify-between items-center mb-6">
-      <div className="flex items-center">
-        <Music className="mr-2 h-5 w-5 text-accent" />
-        <h2 className="text-xl font-semibold">Backline Studios - Reserva de Salas</h2>
-      </div>
-      
+  if (calendarOnly) {
+    return (
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -55,6 +52,15 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           />
         </PopoverContent>
       </Popover>
+    );
+  }
+
+  return (
+    <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center">
+        <Music className="mr-2 h-5 w-5 text-accent" />
+        <h2 className="text-xl font-semibold">Backline Studios - Reserva de Salas</h2>
+      </div>
     </div>
   );
 };
