@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +15,14 @@ const ThankYou: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Main content */}
       <main className="flex-1 container mx-auto px-4 py-8 flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold mb-6 text-center">Backline Studios - Reserva de Salas</h1>
+        <div className="flex flex-col items-center mb-6">
+          <img 
+            src="/lovable-uploads/67186972-9fb4-4463-be3a-c59eff153947.png" 
+            alt="Backline Studios Logo" 
+            className="h-24 mb-4" 
+          />
+          <h1 className="text-4xl font-bold text-center">Backline Studios - Reserva de Salas</h1>
+        </div>
         
         <Card className="w-full max-w-2xl">
           <CardHeader className="border-b">

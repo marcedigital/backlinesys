@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button } from '@/components/ui/button';
-import { MusicIcon, LayoutDashboard, Settings, Calendar, LogOut, BookOpen, Users, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Settings, Calendar, LogOut, BookOpen, Users, Menu, X } from 'lucide-react';
 import { 
   SidebarProvider, 
   Sidebar, 
@@ -167,8 +167,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
             <SheetContent side="left" className="w-72 p-0">
               <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
                 <div className="border-b flex items-center gap-2 px-4 h-14">
-                  <MusicIcon className="h-6 w-6 text-primary" />
-                  <span className="font-semibold text-xl">Sala de Ensayo</span>
+                  <img 
+                    src="/lovable-uploads/67186972-9fb4-4463-be3a-c59eff153947.png" 
+                    alt="Backline Studios Logo" 
+                    className="h-8" 
+                  />
+                  <span className="font-semibold text-xl">Backline Studios</span>
                 </div>
                 <div className="flex-1 p-2">
                   <SidebarMenu>
@@ -195,8 +199,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => {
           <SidebarRail />
           <SidebarHeader className="border-b">
             <div className="flex items-center gap-2 px-4 h-14">
-              <MusicIcon className="h-6 w-6 text-primary" />
-              <span className="font-semibold text-xl">Sala de Ensayo</span>
+              <img 
+                src="/lovable-uploads/67186972-9fb4-4463-be3a-c59eff153947.png" 
+                alt="Backline Studios Logo" 
+                className="h-8" 
+              />
+              <span className="font-semibold text-xl">Backline Studios</span>
             </div>
           </SidebarHeader>
           <SidebarContent>
