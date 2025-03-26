@@ -38,7 +38,7 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="bg-gradient-to-r from-booking-purple to-booking-pink text-white py-6">
+      <header className="bg-gradient-to-r from-accent/90 to-accent text-white py-6">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold">Music Rehearsal Room Scheduler</h1>
           <p className="mt-2 opacity-90">Complete su reserva</p>
@@ -49,15 +49,15 @@ const Login: React.FC = () => {
       <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl text-black">Iniciar sesión</CardTitle>
+            <CardDescription className="text-gray-600">
               Inicie sesión para completar su reserva
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Correo electrónico</Label>
+                <Label htmlFor="email" className="text-black">Correo electrónico</Label>
                 <Input 
                   id="email" 
                   type="email" 
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
+                <Label htmlFor="password" className="text-black">Contraseña</Label>
                 <Input 
                   id="password" 
                   type="password" 
@@ -77,7 +77,7 @@ const Login: React.FC = () => {
                   required 
                 />
               </div>
-              <Button type="submit" className="w-full bg-booking-blue hover:bg-booking-blue/90">
+              <Button type="submit" className="w-full bg-primary text-black hover:bg-primary/80">
                 Iniciar sesión
               </Button>
             </form>
@@ -87,13 +87,13 @@ const Login: React.FC = () => {
                 <div className="w-full border-t border-border"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">O continúe con</span>
+                <span className="bg-background px-2 text-gray-600">O continúe con</span>
               </div>
             </div>
             
             <Button 
               variant="outline" 
-              className="w-full flex items-center justify-center gap-2"
+              className="w-full flex items-center justify-center gap-2 text-black"
               onClick={() => {
                 toast.success("Google login successful");
                 navigate('/confirmation');
@@ -104,13 +104,13 @@ const Login: React.FC = () => {
             </Button>
           </CardContent>
           <CardFooter className="flex flex-col items-center space-y-2">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-gray-600">
               ¿No tiene una cuenta?{" "}
-              <Link to="/register" className="text-booking-blue hover:underline">
+              <Link to="/register" className="text-accent hover:underline">
                 Regístrese
               </Link>
             </div>
-            <Link to="/" className="text-sm text-booking-blue hover:underline">
+            <Link to="/" className="text-sm text-accent hover:underline">
               Volver al calendario
             </Link>
           </CardFooter>
@@ -119,7 +119,7 @@ const Login: React.FC = () => {
       
       {/* Footer */}
       <footer className="bg-white border-t border-border py-4 mt-auto">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+        <div className="container mx-auto px-4 text-center text-sm text-gray-600">
           Music Rehearsal Scheduler &copy; {new Date().getFullYear()}
         </div>
       </footer>

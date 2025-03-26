@@ -58,7 +58,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] glass-morphism animate-scale-in">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold flex items-center">
+          <DialogTitle className="text-xl font-semibold flex items-center text-black">
             <CalendarClock className="w-5 h-5 mr-2 text-primary" />
             Complete your booking
           </DialogTitle>
@@ -67,15 +67,15 @@ const BookingModal: React.FC<BookingModalProps> = ({
         {startTime && endTime && (
           <div className="mb-4">
             <div className="bg-primary/10 rounded-lg p-4 mb-4">
-              <div className="text-sm text-muted-foreground mb-1">Selected time:</div>
-              <div className="font-medium">{formatDate(startTime)}</div>
+              <div className="text-sm text-gray-600 mb-1">Selected time:</div>
+              <div className="font-medium text-black">{formatDate(startTime)}</div>
               <div className="flex items-center mt-2 text-primary">
                 <Clock className="w-4 h-4 mr-1" />
                 <span>{formatTime(startTime)} - {formatTime(endTime)}</span>
               </div>
             </div>
 
-            <h3 className="text-base font-medium mb-3">Select add-ons (optional)</h3>
+            <h3 className="text-base font-medium mb-3 text-black">Select add-ons (optional)</h3>
             <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
               {addOns.map((addOn) => (
                 <AddOnItem
@@ -88,8 +88,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
 
             <div className="mt-6 border-t pt-4">
               <div className="flex justify-between items-center">
-                <span className="font-medium">Total price:</span>
-                <span className="text-xl font-semibold">{formatCurrency(totalPrice)}</span>
+                <span className="font-medium text-black">Total price:</span>
+                <span className="text-xl font-semibold text-black">{formatCurrency(totalPrice)}</span>
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
           <Button 
             variant="outline" 
             onClick={onClose}
-            className="flex items-center"
+            className="flex items-center text-black"
           >
             <X className="w-4 h-4 mr-1" />
             Cancel

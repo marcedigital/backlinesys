@@ -8,13 +8,13 @@
 @layer base {
   :root {
     --background: 180 100% 99%;
-    --foreground: 270 90% 40%;
+    --foreground: 0 0% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 270 90% 40%;
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 270 90% 40%;
+    --popover-foreground: 0 0% 10%;
 
     --primary: 176 100% 50%;
     --primary-foreground: 0 0% 0%;
@@ -23,7 +23,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 180 8% 95%;
-    --muted-foreground: 270 10% 40%;
+    --muted-foreground: 0 0% 40%;
 
     --accent: 282 87% 39%;
     --accent-foreground: 0 0% 100%;
@@ -80,6 +80,14 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-black;
+  }
+
+  p, span, li {
+    @apply text-black;
   }
 
   .glass-morphism {

@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -53,16 +54,16 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				booking: {
-					blue: '#00FFE5',      // Updated to primary color
-					'light-blue': '#DBEAFE',
+					blue: '#00E5D0',      // Slightly less bright version of primary
+					'light-blue': '#E5FFFC',
 					gray: '#F5F5F7',
-					'dark-gray': '#86868B',
+					'dark-gray': '#4A4A4D',
 					green: '#10B981',
 					red: '#EF4444',
 					orange: '#F97316',
-					purple: '#920DBA',    // Updated to secondary/accent color
+					purple: '#920DBA',    // Secondary/accent color
 					pink: '#EC4899',
-					yellow: '#FFD400',    // Updated to tertiary color
+					yellow: '#FFD400',    // Tertiary color
 					overlay: 'rgba(0, 0, 0, 0.5)',
 				}
 			},
