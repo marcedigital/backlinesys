@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { addDays, subDays } from 'date-fns';
 import {
@@ -184,6 +183,36 @@ const Calendar: React.FC = () => {
   };
 
   const handleSelectEnd = (slot: TimeSlotType) => {
+    // If the slot is the same as the start slot, it's a single hour selection
+    if (selectionStart && slot.id === selectionStart.id) {
+      // Mark this single slot as selected
+      const isCurrentDaySlot = timeSlots[selectedRoom]?.some(s => s.id === slot.id);
+      
+      if (isCurrentDaySlot) {
+        setTimeSlots(prev => ({
+          ...prev,
+          [selectedRoom]: prev[selectedRoom].map(s => ({
+            ...s,
+            isSelected: s.id === slot.id
+          }))
+        }));
+      } else {
+        setNextDayTimeSlots(prev => ({
+          ...prev,
+          [selectedRoom]: prev[selectedRoom].map(s => ({
+            ...s,
+            isSelected: s.id === slot.id
+          }))
+        }));
+      }
+      
+      setIsSelecting(false);
+      setSelectionEnd(slot);
+      setTempSelectionEnd(null);
+      setIsModalOpen(true);
+      return;
+    }
+    
     if (!isSelecting || !slot.isAvailable || !selectionStart) return;
     
     // Don't allow selecting the same slot as start and end
@@ -375,48 +404,38 @@ const Calendar: React.FC = () => {
       />
       
       <div className="mt-6 mb-6">
-        <div className="flex justify-end mb-4">
-          <CalendarHeader 
-            selectedDate={selectedDate}
-            onDateChange={handleDateChange}
-            calendarOnly={true}
-          />
-        </div>
-        
         <div className="bg-white rounded-xl p-4 shadow-sm border border-border">
           <h3 className="text-lg font-medium mb-4">Horas disponibles - {rooms.find(r => r.id === selectedRoom)?.name}</h3>
           
-          <div className="bg-gradient-to-r from-[rgba(255,212,0,0.05)] to-[rgba(0,255,229,0.1)] p-4 rounded-lg">
-            <RoomTimeslots
-              rooms={rooms}
-              selectedRoom={selectedRoom}
-              timeSlots={timeSlots}
-              isSelecting={isSelecting}
-              onRoomChange={handleRoomChange}
-              onSelectStart={handleSelectStart}
-              onSelectEnd={handleSelectEnd}
-              onMouseEnter={handleMouseEnter}
-              isInSelectionRange={isInSelectionRange}
-            />
-          </div>
+          <RoomTimeslots
+            rooms={rooms}
+            selectedRoom={selectedRoom}
+            timeSlots={timeSlots}
+            isSelecting={isSelecting}
+            onRoomChange={handleRoomChange}
+            onSelectStart={handleSelectStart}
+            onSelectEnd={handleSelectEnd}
+            onMouseEnter={handleMouseEnter}
+            isInSelectionRange={isInSelectionRange}
+            selectedDate={selectedDate}
+            onDateChange={handleDateChange}
+          />
         </div>
         
         <div className="mt-8 bg-white rounded-xl p-4 shadow-sm border border-border">
           <h3 className="text-lg font-medium mb-4">Horas disponibles - Siguiente día</h3>
           
-          <div className="bg-gradient-to-r from-[rgba(255,212,0,0.05)] to-[rgba(0,255,229,0.1)] p-4 rounded-lg">
-            <RoomTimeslots
-              rooms={rooms}
-              selectedRoom={selectedRoom}
-              timeSlots={nextDayTimeSlots}
-              isSelecting={isSelecting}
-              onRoomChange={handleRoomChange}
-              onSelectStart={handleSelectStart}
-              onSelectEnd={handleSelectEnd}
-              onMouseEnter={handleMouseEnter}
-              isInSelectionRange={isInSelectionRange}
-            />
-          </div>
+          <RoomTimeslots
+            rooms={rooms}
+            selectedRoom={selectedRoom}
+            timeSlots={nextDayTimeSlots}
+            isSelecting={isSelecting}
+            onRoomChange={handleRoomChange}
+            onSelectStart={handleSelectStart}
+            onSelectEnd={handleSelectEnd}
+            onMouseEnter={handleMouseEnter}
+            isInSelectionRange={isInSelectionRange}
+          />
         </div>
       </div>
       

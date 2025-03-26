@@ -15,6 +15,8 @@ interface RoomTimeslotsProps {
   onSelectEnd: (slot: TimeSlotType) => void;
   onMouseEnter: (slot: TimeSlotType) => void;
   isInSelectionRange: (slot: TimeSlotType) => boolean;
+  selectedDate?: Date;
+  onDateChange?: (date: Date) => void;
 }
 
 const RoomTimeslots: React.FC<RoomTimeslotsProps> = ({
@@ -27,6 +29,8 @@ const RoomTimeslots: React.FC<RoomTimeslotsProps> = ({
   onSelectEnd,
   onMouseEnter,
   isInSelectionRange,
+  selectedDate,
+  onDateChange,
 }) => {
   return (
     <Tabs 
@@ -44,20 +48,18 @@ const RoomTimeslots: React.FC<RoomTimeslotsProps> = ({
       
       {rooms.map(room => (
         <TabsContent key={room.id} value={room.id} className="mt-0">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-border">
-            <h3 className="text-base font-medium mb-4">Available Times - {room.name}</h3>
-            
-            <TimeSlotsGrid
-              timeSlots={timeSlots[room.id] || []}
-              isSelecting={isSelecting}
-              onSelectStart={onSelectStart}
-              onSelectEnd={onSelectEnd}
-              onMouseEnter={onMouseEnter}
-              isInSelectionRange={isInSelectionRange}
-            />
-            
-            <TimeSlotsLegend />
-          </div>
+          <TimeSlotsGrid
+            timeSlots={timeSlots[room.id] || []}
+            isSelecting={isSelecting}
+            onSelectStart={onSelectStart}
+            onSelectEnd={onSelectEnd}
+            onMouseEnter={onMouseEnter}
+            isInSelectionRange={isInSelectionRange}
+            selectedDate={selectedDate}
+            onDateChange={onDateChange}
+          />
+          
+          <TimeSlotsLegend />
         </TabsContent>
       ))}
     </Tabs>

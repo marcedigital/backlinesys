@@ -31,6 +31,14 @@ const TimeSlot: React.FC<TimeSlotProps> = ({
     }
   };
 
+  const handleDoubleClick = () => {
+    if (!slot.isAvailable) return;
+    
+    onSelectStart(slot);
+    // When double-clicked, use the same slot for both start and end
+    onSelectEnd(slot);
+  };
+
   const handleMouseEnter = () => {
     onMouseEnter(slot);
   };
@@ -45,6 +53,7 @@ const TimeSlot: React.FC<TimeSlotProps> = ({
         !slot.isAvailable && 'bg-gray-100 text-gray-500'
       )}
       onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
       onMouseEnter={handleMouseEnter}
     >
       <div className="flex justify-between items-center">
