@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { addDays, subDays } from 'date-fns';
 import {
@@ -16,10 +17,10 @@ import BookingInstructions from './calendar/BookingInstructions';
 import RoomSelector from './calendar/RoomSelector';
 import RoomTimeslots from './calendar/RoomTimeslots';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 
 const Calendar: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedRoom, setSelectedRoom] = useState(rooms[0].id);
   const [timeSlots, setTimeSlots] = useState<{ [roomId: string]: TimeSlotType[] }>({});
@@ -375,7 +376,7 @@ const Calendar: React.FC = () => {
     setIsModalOpen(false);
     
     // After confirming add-ons, navigate to login page
-    navigate('/login');
+    router.push('/login');
     
     console.log('Booking confirmed:', bookingDetails);
     

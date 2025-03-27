@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { format, addMonths } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon, Music } from 'lucide-react';
