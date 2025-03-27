@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { addDays, subDays } from 'date-fns';
+import { useNavigate } from 'react-router-dom'; // Changed from next/router to react-router-dom
 import {
   getDefaultAddOns,
   getUnavailableTimes,
@@ -17,10 +18,9 @@ import BookingInstructions from './calendar/BookingInstructions';
 import RoomSelector from './calendar/RoomSelector';
 import RoomTimeslots from './calendar/RoomTimeslots';
 import { toast } from 'sonner';
-import { useRouter } from 'next/router';
 
 const Calendar: React.FC = () => {
-  const router = useRouter();
+  const navigate = useNavigate(); // Use React Router's useNavigate instead of Next.js router
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedRoom, setSelectedRoom] = useState(rooms[0].id);
   const [timeSlots, setTimeSlots] = useState<{ [roomId: string]: TimeSlotType[] }>({});
@@ -376,7 +376,7 @@ const Calendar: React.FC = () => {
     setIsModalOpen(false);
     
     // After confirming add-ons, navigate to login page
-    router.push('/login');
+    navigate('/login'); // Changed from router.push to navigate
     
     console.log('Booking confirmed:', bookingDetails);
     
