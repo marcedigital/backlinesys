@@ -6,6 +6,7 @@ import { BookingDetails, formatTime } from '@/utils/bookingUtils';
 import AddOnItem from './AddOnItem';
 import { CalendarClock, Clock, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useBooking } from '@/context/BookingContext';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -23,8 +24,15 @@ const BookingModal: React.FC<BookingModalProps> = ({
   onConfirm,
 }) => {
   const { startTime, endTime, addOns, totalPrice } = bookingDetails;
+  const { setBookingData, resetCouponAndDiscount } = useBooking();
 
   const handleConfirm = () => {
+    // Store booking details in context
+    setBookingData({...bookingDetails});
+    
+    // Reset any previous coupon when making a new booking
+    resetCouponAndDiscount();
+    
     toast.success('Booking confirmed!', {
       description: `Your music rehearsal room has been booked successfully.`,
     });

@@ -1,4 +1,3 @@
-
 export interface TimeSlot {
   id: string;
   startTime: Date;
