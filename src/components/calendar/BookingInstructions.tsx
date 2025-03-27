@@ -1,45 +1,58 @@
 
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { Calendar, Clock, Music, CheckCircle } from 'lucide-react';
 
 const BookingInstructions: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <Collapsible
-      open={isOpen}
-      onOpenChange={setIsOpen}
-      className={`bg-gradient-to-r from-accent/20 to-primary/20 p-4 rounded-lg mb-6 text-sm border border-primary`}
-    >
-      <div className="flex items-center justify-between">
-        <h3 className="font-medium text-black text-base">Cómo reservar:</h3>
-        <CollapsibleTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className={isOpen ? "" : "bg-primary hover:bg-primary/80"}
-          >
-            {isOpen ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </Button>
-        </CollapsibleTrigger>
-      </div>
+    <div className="bg-white p-6 rounded-lg mb-6 border border-border shadow-sm">
+      <h3 className="font-medium text-black text-lg mb-6">Cómo reservar una sala</h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Step 1 */}
+        <div className="flex flex-col items-center text-center">
+          <div className="bg-purple-100 p-3 rounded-full mb-3">
+            <Calendar className="h-5 w-5 text-accent" />
+          </div>
+          <p className="font-medium mb-1">1. Elige fecha</p>
+          <p className="text-sm text-gray-600">
+            Selecciona el día en que deseas reservar la sala
+          </p>
+        </div>
 
-      <CollapsibleContent className="mt-2">
-        <ol className="list-decimal ml-5 space-y-1 text-gray-800">
-          <li>Selecciona una sala de ensayo haciendo clic en una pestaña de sala</li>
-          <li>Selecciona la primera hora de tu sesión</li>
-          <li>Selecciona la última hora de tu sesión</li>
-          <li>Puedes seleccionar horarios continuos incluso entre días diferentes</li>
-          <li>Elige equipamiento opcional y confirma tu reserva</li>
-        </ol>
-      </CollapsibleContent>
-    </Collapsible>
+        {/* Step 2 */}
+        <div className="flex flex-col items-center text-center">
+          <div className="bg-purple-100 p-3 rounded-full mb-3">
+            <Clock className="h-5 w-5 text-accent" />
+          </div>
+          <p className="font-medium mb-1">2. Selecciona horario</p>
+          <p className="text-sm text-gray-600">
+            Haz clic en la hora de inicio y fin para tu reserva
+          </p>
+        </div>
+
+        {/* Step 3 */}
+        <div className="flex flex-col items-center text-center">
+          <div className="bg-purple-100 p-3 rounded-full mb-3">
+            <Music className="h-5 w-5 text-accent" />
+          </div>
+          <p className="font-medium mb-1">3. Selecciona extras</p>
+          <p className="text-sm text-gray-600">
+            Agrega equipos o servicios adicionales si lo necesitas
+          </p>
+        </div>
+
+        {/* Step 4 */}
+        <div className="flex flex-col items-center text-center">
+          <div className="bg-purple-100 p-3 rounded-full mb-3">
+            <CheckCircle className="h-5 w-5 text-accent" />
+          </div>
+          <p className="font-medium mb-1">4. Confirma tu reserva</p>
+          <p className="text-sm text-gray-600">
+            Revisa los detalles y completa el proceso de reserva
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
